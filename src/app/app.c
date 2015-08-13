@@ -43,7 +43,7 @@ void hello_process( void )
 void led_process( void )
 {
 	static uint8_t col = 0;
-	static uint8_t prevcol = 59;
+	static uint8_t prevcol = 11;
 
 	if( ws2812_get_transferring() == 0)
 	{
@@ -51,12 +51,12 @@ void led_process( void )
 		ws2812_set(0, prevcol, 0x00, 0x00, 0x00);
 
 		col++;
-		prevcol = (col-1) % 60;
+		prevcol = (col-1) % 12;
 
-		if( col == 60)
+		if( col == 12)
 		{
 			col = 0;
-			prevcol = 59;
+			prevcol = 11;
 		}
 
 		ws2812_send();
