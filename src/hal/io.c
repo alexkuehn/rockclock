@@ -17,6 +17,9 @@ void io_init( void )
 	/* Setup GPIO pin GPIO8/9 on GPIO port C for LEDs. */
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_BLUE_PIN);
 
+	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO9);
+	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO10);
+
 }
 
 void io_toggle( uint32_t port, uint16_t pos)

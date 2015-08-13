@@ -11,5 +11,5 @@
 extern void app_init(void);
 extern void blink_process(void);
 extern void hello_process(void);
-
+extern void led_process(void);
 #endif /* SRC_APP_APP_IF_H_ */

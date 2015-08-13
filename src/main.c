@@ -25,7 +25,6 @@
 #include "app/app_if.h"
 
 
-#include "hal/io_if.h"
 
 int main(void)
 {
@@ -36,6 +35,9 @@ int main(void)
 
 	while (1) {
 		scheduler_process();
+
+
+
 	}
 
 	return 0;
