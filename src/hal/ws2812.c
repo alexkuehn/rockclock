@@ -14,27 +14,27 @@
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/scb.h>
+
 
 #include "io_if.h"
 
 static uint8_t low_pattern = 0x00;
 static uint8_t high_pattern = 0xFF;
 
-static uint8_t frame_pattern[WS2812_BUFFERSIZE];
-static uint8_t frame_pattern_back[WS2812_BUFFERSIZE];
+static uint8_t frame_pattern[3*NR_OF_LEDS_PER_CH*NR_OF_ROWS];
+static uint8_t bitframe_pattern[WS2812_BUFFERSIZE];
+static uint8_t bitframe_pattern_back[WS2812_BUFFERSIZE];
 
 static uint8_t waitcnt = 0;
 
+static uint8_t *actual_bitframe = bitframe_pattern;
+static uint8_t *backed_bitframe = bitframe_pattern_back;
 
 static volatile uint8_t transferring = 0;
 
 void ws2812_clear( void )
 {
-	uint32_t i;
-	for( i = 0; i < WS2812_BUFFERSIZE; i++ )
-		{
-			frame_pattern[i] = 0;
-		}
 }
 
 void ws2812_set( uint8_t row, uint8_t col, uint8_t red, uint8_t green, uint8_t blue )
@@ -44,19 +44,33 @@ void ws2812_set( uint8_t row, uint8_t col, uint8_t red, uint8_t green, uint8_t b
 	for( i = 0; i < 8; i++)
 	{
 		/* clear data */
-		frame_pattern[((col*24)+i)] &= ~(0x01<<row);
-		frame_pattern[((col*24)+8+i)] &= ~(0x01<<row);
-		frame_pattern[((col*24)+16+i)] &= ~(0x01<<row);
+		bitframe_pattern[((col*24)+i)] &= ~(0x01<<row);
+		bitframe_pattern[((col*24)+8+i)] &= ~(0x01<<row);
+		bitframe_pattern[((col*24)+16+i)] &= ~(0x01<<row);
 		/* write new value */
-		frame_pattern[((col*24)+i)] |= ((((green<<i) & 0x80)>>7)<<row);
-		frame_pattern[((col*24)+8+i)] |= ((((red<<i) & 0x80)>>7)<<row);
-		frame_pattern[((col*24)+16+i)] |= ((((blue<<i) & 0x80)>>7)<<row);
+		bitframe_pattern[((col*24)+i)] |= ((((green<<i) & 0x80)>>7)<<row);
+		bitframe_pattern[((col*24)+8+i)] |= ((((red<<i) & 0x80)>>7)<<row);
+		bitframe_pattern[((col*24)+16+i)] |= ((((blue<<i) & 0x80)>>7)<<row);
 	}
 }
 
 void ws2812_init( void )
 {
-	uint32_t i;
+	uint32_t i,j;
+
+	for( i = 0; i < WS2812_BUFFERSIZE; i++ )
+	{
+		bitframe_pattern[i] = 0;
+
+		bitframe_pattern_back[i] = 0;
+
+	}
+
+	for( i=0; i < (3*NR_OF_LEDS_PER_CH*NR_OF_ROWS); i++)
+	{
+		frame_pattern[i] = 0;
+
+	}
 
 	/* configure the GPIOs */
 	/* Enable GPIOC clock  */
@@ -81,7 +95,7 @@ void ws2812_init( void )
 
 	dma_channel_reset( DMA1, DMA_CHANNEL4);
 	dma_set_peripheral_address( DMA1, DMA_CHANNEL4, (uint32_t)&GPIOB_ODR);
-    dma_set_memory_address( DMA1, DMA_CHANNEL4, (uint32_t)&frame_pattern);
+    dma_set_memory_address( DMA1, DMA_CHANNEL4, (uint32_t)actual_bitframe);
     dma_set_peripheral_size( DMA1, DMA_CHANNEL4, DMA_CCR_PSIZE_8BIT);
     dma_set_memory_size( DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
     dma_disable_peripheral_increment_mode( DMA1, DMA_CHANNEL4 );
@@ -124,15 +138,83 @@ void ws2812_init( void )
     timer_disable_oc_preload( TIM3, TIM_OC3);
 
     nvic_set_priority( NVIC_TIM3_IRQ,1);
+    nvic_set_priority( NVIC_PENDSV_IRQ, 2);
     nvic_enable_irq(NVIC_TIM3_IRQ);
+    nvic_enable_irq(NVIC_PENDSV_IRQ);
 
-	for( i = 0; i < WS2812_BUFFERSIZE; i++ )
+}
+
+void pend_sv_handler( void )
+{
+	uint32_t i,j;
+	uint32_t bitindex, bufferindex;
+	uint32_t mask;
+	io_on( GPIOC, GPIO9);
+
+
+
+	for( i = 0; i < NR_OF_LEDS_PER_CH; i++ )
 	{
-		frame_pattern[i] = 0;
+		bitindex = i*24;
+		bufferindex = i*3*NR_OF_ROWS;
 
-		frame_pattern_back[i] = 0;
+		mask = frame_pattern[bufferindex];
+		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
+		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
+		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
+		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
+		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
+		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
+		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
+		backed_bitframe[bitindex+7] = (mask & 0x01);
+
+		bufferindex++;
+
+		mask = frame_pattern[bufferindex];
+		bitindex += 8;
+
+		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
+		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
+		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
+		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
+		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
+		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
+		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
+		backed_bitframe[bitindex+7] = (mask & 0x01);
+
+		bufferindex++;
+
+		mask = frame_pattern[bufferindex];
+		bitindex += 8;
+
+		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
+		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
+		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
+		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
+		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
+		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
+		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
+		backed_bitframe[bitindex+7] = (mask & 0x01);
+
+
+#if(0)
+		for( i = 0; i < 8; i++)
+		{
+			/* clear data */
+			backed_bitframe[((col*24)+i)] &= ~(0x01<<row);
+			backed_bitframe[((col*24)+8+i)] &= ~(0x01<<row);
+			backed_bitframe[((col*24)+16+i)] &= ~(0x01<<row);
+			/* write new value */
+			backed_bitframe[((col*24)+i)] |= ((((green<<i) & 0x80)>>7)<<row);
+			backed_bitframe[((col*24)+8+i)] |= ((((red<<i) & 0x80)>>7)<<row);
+			backed_bitframe[((col*24)+16+i)] |= ((((blue<<i) & 0x80)>>7)<<row);
+		}
+#endif
 
 	}
+
+	io_off( GPIOC, GPIO9);
+
 }
 
 void dma1_channel2_3_isr( void )
@@ -155,7 +237,7 @@ void ws2812_send( void )
 {
 	transferring = 1;
 
-
+	io_on( GPIOC, GPIO10);
 
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL2, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL3, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
@@ -178,12 +260,26 @@ void ws2812_send( void )
 
 	timer_set_counter(TIM3, 60);
 
+
 	timer_enable_counter(TIM3);
+
+
+	SCB_ICSR |= SCB_ICSR_PENDSVSET;
+
+
+
 }
 
 void tim3_isr(void)
 {
+	static uint8_t *bftemp;
 	timer_clear_flag(TIM3, TIM_SR_UIF);
+
+#if(0)
+	bftemp = actual_bitframe;
+	actual_bitframe = backed_bitframe;
+	backed_bitframe = bftemp;
+#endif
 
 	if( waitcnt < NR_OF_WAITCOUNTS)
 	{
@@ -192,7 +288,7 @@ void tim3_isr(void)
 	}
 	else
 	{
-
+		io_off( GPIOC, GPIO10);
 		waitcnt = 0;
 		timer_disable_counter(TIM3);
 		timer_disable_irq(TIM3, TIM_DIER_UIE);
