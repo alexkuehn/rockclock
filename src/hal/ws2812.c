@@ -148,7 +148,7 @@ void pend_sv_handler( void )
 {
 	uint32_t i,j;
 	uint32_t bitindex, bufferindex;
-	uint32_t mask;
+	uint32_t mask[8];
 	io_on( GPIOC, GPIO9);
 
 
@@ -158,43 +158,275 @@ void pend_sv_handler( void )
 		bitindex = i*24;
 		bufferindex = i*3*NR_OF_ROWS;
 
-		mask = frame_pattern[bufferindex];
-		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
-		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
-		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
-		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
-		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
-		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
-		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
-		backed_bitframe[bitindex+7] = (mask & 0x01);
+		mask[0] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[1] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[2] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[3] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[4] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[5] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[6] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[7] = frame_pattern[bufferindex];
+
+		backed_bitframe[bitindex] = (mask[0] & 0x80) >> 7;
+		backed_bitframe[bitindex] |= ((mask[1] & 0x80) >> 7) << 1;
+		backed_bitframe[bitindex] |= ((mask[2] & 0x80) >> 7) << 2;
+		backed_bitframe[bitindex] |= ((mask[3] & 0x80) >> 7) << 3;
+		backed_bitframe[bitindex] |= ((mask[4] & 0x80) >> 7) << 4;
+		backed_bitframe[bitindex] |= ((mask[5] & 0x80) >> 7) << 5;
+		backed_bitframe[bitindex] |= ((mask[6] & 0x80) >> 7) << 6;
+		backed_bitframe[bitindex] |= ((mask[7] & 0x80) >> 7) << 7;
+
+		backed_bitframe[bitindex+1] = (mask[0] & 0x40) >> 6;
+		backed_bitframe[bitindex+1] |= ((mask[1] & 0x40) >> 6) << 1;
+		backed_bitframe[bitindex+1] |= ((mask[2] & 0x40) >> 6) << 2;
+		backed_bitframe[bitindex+1] |= ((mask[3] & 0x40) >> 6) << 3;
+		backed_bitframe[bitindex+1] |= ((mask[4] & 0x40) >> 6) << 4;
+		backed_bitframe[bitindex+1] |= ((mask[5] & 0x40) >> 6) << 5;
+		backed_bitframe[bitindex+1] |= ((mask[6] & 0x40) >> 6) << 6;
+		backed_bitframe[bitindex+1] |= ((mask[7] & 0x40) >> 6) << 7;
+
+		backed_bitframe[bitindex+2] = (mask[0] & 0x20) >> 5;
+		backed_bitframe[bitindex+2] |= ((mask[1] & 0x20) >> 5) << 1;
+		backed_bitframe[bitindex+2] |= ((mask[2] & 0x20) >> 5) << 2;
+		backed_bitframe[bitindex+2] |= ((mask[3] & 0x20) >> 5) << 3;
+		backed_bitframe[bitindex+2] |= ((mask[4] & 0x20) >> 5) << 4;
+		backed_bitframe[bitindex+2] |= ((mask[5] & 0x20) >> 5) << 5;
+		backed_bitframe[bitindex+2] |= ((mask[6] & 0x20) >> 5) << 6;
+		backed_bitframe[bitindex+2] |= ((mask[7] & 0x20) >> 5) << 7;
+
+		backed_bitframe[bitindex+3] = (mask[0] & 0x10) >> 4;
+		backed_bitframe[bitindex+3] |= ((mask[1] & 0x10) >> 4) << 1;
+		backed_bitframe[bitindex+3] |= ((mask[2] & 0x10) >> 4) << 2;
+		backed_bitframe[bitindex+3] |= ((mask[3] & 0x10) >> 4) << 3;
+		backed_bitframe[bitindex+3] |= ((mask[4] & 0x10) >> 4) << 4;
+		backed_bitframe[bitindex+3] |= ((mask[5] & 0x10) >> 4) << 5;
+		backed_bitframe[bitindex+3] |= ((mask[6] & 0x10) >> 4) << 6;
+		backed_bitframe[bitindex+3] |= ((mask[7] & 0x10) >> 4) << 7;
+
+		backed_bitframe[bitindex+4] = (mask[0] & 0x08) >> 3;
+		backed_bitframe[bitindex+4] |= ((mask[1] & 0x08) >> 3) << 1;
+		backed_bitframe[bitindex+4] |= ((mask[2] & 0x08) >> 3) << 2;
+		backed_bitframe[bitindex+4] |= ((mask[3] & 0x08) >> 3) << 3;
+		backed_bitframe[bitindex+4] |= ((mask[4] & 0x08) >> 3) << 4;
+		backed_bitframe[bitindex+4] |= ((mask[5] & 0x08) >> 3) << 5;
+		backed_bitframe[bitindex+4] |= ((mask[6] & 0x08) >> 3) << 6;
+		backed_bitframe[bitindex+4] |= ((mask[7] & 0x08) >> 3) << 7;
+
+		backed_bitframe[bitindex+5] = (mask[0] & 0x04) >> 2;
+		backed_bitframe[bitindex+5] |= ((mask[1] & 0x04) >> 2) << 1;
+		backed_bitframe[bitindex+5] |= ((mask[2] & 0x04) >> 2) << 2;
+		backed_bitframe[bitindex+5] |= ((mask[3] & 0x04) >> 2) << 3;
+		backed_bitframe[bitindex+5] |= ((mask[4] & 0x04) >> 2) << 4;
+		backed_bitframe[bitindex+5] |= ((mask[5] & 0x04) >> 2) << 5;
+		backed_bitframe[bitindex+5] |= ((mask[6] & 0x04) >> 2) << 6;
+		backed_bitframe[bitindex+5] |= ((mask[7] & 0x04) >> 2) << 7;
+
+		backed_bitframe[bitindex+6] = (mask[0] & 0x02) >> 1;
+		backed_bitframe[bitindex+6] |= ((mask[1] & 0x02) >> 1) << 1;
+		backed_bitframe[bitindex+6] |= ((mask[2] & 0x02) >> 1) << 2;
+		backed_bitframe[bitindex+6] |= ((mask[3] & 0x02) >> 1) << 3;
+		backed_bitframe[bitindex+6] |= ((mask[4] & 0x02) >> 1) << 4;
+		backed_bitframe[bitindex+6] |= ((mask[5] & 0x02) >> 1) << 5;
+		backed_bitframe[bitindex+6] |= ((mask[6] & 0x02) >> 1) << 6;
+		backed_bitframe[bitindex+6] |= ((mask[7] & 0x02) >> 1) << 7;
+
+		backed_bitframe[bitindex+7] = (mask[0] & 0x01);
+		backed_bitframe[bitindex+7] |= ((mask[1] & 0x01)) << 1;
+		backed_bitframe[bitindex+7] |= ((mask[2] & 0x01)) << 2;
+		backed_bitframe[bitindex+7] |= ((mask[3] & 0x01)) << 3;
+		backed_bitframe[bitindex+7] |= ((mask[4] & 0x01)) << 4;
+		backed_bitframe[bitindex+7] |= ((mask[5] & 0x01)) << 5;
+		backed_bitframe[bitindex+7] |= ((mask[6] & 0x01)) << 6;
+		backed_bitframe[bitindex+7] |= ((mask[7] & 0x01)) << 7;
 
 		bufferindex++;
 
-		mask = frame_pattern[bufferindex];
+		mask[0] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[1] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[2] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[3] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[4] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[5] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[6] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[7] = frame_pattern[bufferindex];
 		bitindex += 8;
 
-		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
-		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
-		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
-		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
-		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
-		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
-		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
-		backed_bitframe[bitindex+7] = (mask & 0x01);
+		backed_bitframe[bitindex] = (mask[0] & 0x80) >> 7;
+		backed_bitframe[bitindex] |= ((mask[1] & 0x80) >> 7) << 1;
+		backed_bitframe[bitindex] |= ((mask[2] & 0x80) >> 7) << 2;
+		backed_bitframe[bitindex] |= ((mask[3] & 0x80) >> 7) << 3;
+		backed_bitframe[bitindex] |= ((mask[4] & 0x80) >> 7) << 4;
+		backed_bitframe[bitindex] |= ((mask[5] & 0x80) >> 7) << 5;
+		backed_bitframe[bitindex] |= ((mask[6] & 0x80) >> 7) << 6;
+		backed_bitframe[bitindex] |= ((mask[7] & 0x80) >> 7) << 7;
+
+		backed_bitframe[bitindex+1] = (mask[0] & 0x40) >> 6;
+		backed_bitframe[bitindex+1] |= ((mask[1] & 0x40) >> 6) << 1;
+		backed_bitframe[bitindex+1] |= ((mask[2] & 0x40) >> 6) << 2;
+		backed_bitframe[bitindex+1] |= ((mask[3] & 0x40) >> 6) << 3;
+		backed_bitframe[bitindex+1] |= ((mask[4] & 0x40) >> 6) << 4;
+		backed_bitframe[bitindex+1] |= ((mask[5] & 0x40) >> 6) << 5;
+		backed_bitframe[bitindex+1] |= ((mask[6] & 0x40) >> 6) << 6;
+		backed_bitframe[bitindex+1] |= ((mask[7] & 0x40) >> 6) << 7;
+
+		backed_bitframe[bitindex+2] = (mask[0] & 0x20) >> 5;
+		backed_bitframe[bitindex+2] |= ((mask[1] & 0x20) >> 5) << 1;
+		backed_bitframe[bitindex+2] |= ((mask[2] & 0x20) >> 5) << 2;
+		backed_bitframe[bitindex+2] |= ((mask[3] & 0x20) >> 5) << 3;
+		backed_bitframe[bitindex+2] |= ((mask[4] & 0x20) >> 5) << 4;
+		backed_bitframe[bitindex+2] |= ((mask[5] & 0x20) >> 5) << 5;
+		backed_bitframe[bitindex+2] |= ((mask[6] & 0x20) >> 5) << 6;
+		backed_bitframe[bitindex+2] |= ((mask[7] & 0x20) >> 5) << 7;
+
+		backed_bitframe[bitindex+3] = (mask[0] & 0x10) >> 4;
+		backed_bitframe[bitindex+3] |= ((mask[1] & 0x10) >> 4) << 1;
+		backed_bitframe[bitindex+3] |= ((mask[2] & 0x10) >> 4) << 2;
+		backed_bitframe[bitindex+3] |= ((mask[3] & 0x10) >> 4) << 3;
+		backed_bitframe[bitindex+3] |= ((mask[4] & 0x10) >> 4) << 4;
+		backed_bitframe[bitindex+3] |= ((mask[5] & 0x10) >> 4) << 5;
+		backed_bitframe[bitindex+3] |= ((mask[6] & 0x10) >> 4) << 6;
+		backed_bitframe[bitindex+3] |= ((mask[7] & 0x10) >> 4) << 7;
+
+		backed_bitframe[bitindex+4] = (mask[0] & 0x08) >> 3;
+		backed_bitframe[bitindex+4] |= ((mask[1] & 0x08) >> 3) << 1;
+		backed_bitframe[bitindex+4] |= ((mask[2] & 0x08) >> 3) << 2;
+		backed_bitframe[bitindex+4] |= ((mask[3] & 0x08) >> 3) << 3;
+		backed_bitframe[bitindex+4] |= ((mask[4] & 0x08) >> 3) << 4;
+		backed_bitframe[bitindex+4] |= ((mask[5] & 0x08) >> 3) << 5;
+		backed_bitframe[bitindex+4] |= ((mask[6] & 0x08) >> 3) << 6;
+		backed_bitframe[bitindex+4] |= ((mask[7] & 0x08) >> 3) << 7;
+
+		backed_bitframe[bitindex+5] = (mask[0] & 0x04) >> 2;
+		backed_bitframe[bitindex+5] |= ((mask[1] & 0x04) >> 2) << 1;
+		backed_bitframe[bitindex+5] |= ((mask[2] & 0x04) >> 2) << 2;
+		backed_bitframe[bitindex+5] |= ((mask[3] & 0x04) >> 2) << 3;
+		backed_bitframe[bitindex+5] |= ((mask[4] & 0x04) >> 2) << 4;
+		backed_bitframe[bitindex+5] |= ((mask[5] & 0x04) >> 2) << 5;
+		backed_bitframe[bitindex+5] |= ((mask[6] & 0x04) >> 2) << 6;
+		backed_bitframe[bitindex+5] |= ((mask[7] & 0x04) >> 2) << 7;
+
+		backed_bitframe[bitindex+6] = (mask[0] & 0x02) >> 1;
+		backed_bitframe[bitindex+6] |= ((mask[1] & 0x02) >> 1) << 1;
+		backed_bitframe[bitindex+6] |= ((mask[2] & 0x02) >> 1) << 2;
+		backed_bitframe[bitindex+6] |= ((mask[3] & 0x02) >> 1) << 3;
+		backed_bitframe[bitindex+6] |= ((mask[4] & 0x02) >> 1) << 4;
+		backed_bitframe[bitindex+6] |= ((mask[5] & 0x02) >> 1) << 5;
+		backed_bitframe[bitindex+6] |= ((mask[6] & 0x02) >> 1) << 6;
+		backed_bitframe[bitindex+6] |= ((mask[7] & 0x02) >> 1) << 7;
+
+		backed_bitframe[bitindex+7] = (mask[0] & 0x01);
+		backed_bitframe[bitindex+7] |= ((mask[1] & 0x01)) << 1;
+		backed_bitframe[bitindex+7] |= ((mask[2] & 0x01)) << 2;
+		backed_bitframe[bitindex+7] |= ((mask[3] & 0x01)) << 3;
+		backed_bitframe[bitindex+7] |= ((mask[4] & 0x01)) << 4;
+		backed_bitframe[bitindex+7] |= ((mask[5] & 0x01)) << 5;
+		backed_bitframe[bitindex+7] |= ((mask[6] & 0x01)) << 6;
+		backed_bitframe[bitindex+7] |= ((mask[7] & 0x01)) << 7;
 
 		bufferindex++;
 
-		mask = frame_pattern[bufferindex];
+		mask[0] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[1] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[2] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[3] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[4] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[5] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[6] = frame_pattern[bufferindex];
+		bufferindex++;
+		mask[7] = frame_pattern[bufferindex];
 		bitindex += 8;
 
-		backed_bitframe[bitindex] = (mask & 0x80) >> 7;
-		backed_bitframe[bitindex+1] = (mask & 0x40) >> 6;
-		backed_bitframe[bitindex+2] = (mask & 0x20) >> 5;
-		backed_bitframe[bitindex+3] = (mask & 0x10) >> 4;
-		backed_bitframe[bitindex+4] = (mask & 0x08) >> 3;
-		backed_bitframe[bitindex+5] = (mask & 0x04) >> 2;
-		backed_bitframe[bitindex+6] = (mask & 0x02) >> 1;
-		backed_bitframe[bitindex+7] = (mask & 0x01);
+		backed_bitframe[bitindex] = (mask[0] & 0x80) >> 7;
+		backed_bitframe[bitindex] |= ((mask[1] & 0x80) >> 7) << 1;
+		backed_bitframe[bitindex] |= ((mask[2] & 0x80) >> 7) << 2;
+		backed_bitframe[bitindex] |= ((mask[3] & 0x80) >> 7) << 3;
+		backed_bitframe[bitindex] |= ((mask[4] & 0x80) >> 7) << 4;
+		backed_bitframe[bitindex] |= ((mask[5] & 0x80) >> 7) << 5;
+		backed_bitframe[bitindex] |= ((mask[6] & 0x80) >> 7) << 6;
+		backed_bitframe[bitindex] |= ((mask[7] & 0x80) >> 7) << 7;
+
+		backed_bitframe[bitindex+1] = (mask[0] & 0x40) >> 6;
+		backed_bitframe[bitindex+1] |= ((mask[1] & 0x40) >> 6) << 1;
+		backed_bitframe[bitindex+1] |= ((mask[2] & 0x40) >> 6) << 2;
+		backed_bitframe[bitindex+1] |= ((mask[3] & 0x40) >> 6) << 3;
+		backed_bitframe[bitindex+1] |= ((mask[4] & 0x40) >> 6) << 4;
+		backed_bitframe[bitindex+1] |= ((mask[5] & 0x40) >> 6) << 5;
+		backed_bitframe[bitindex+1] |= ((mask[6] & 0x40) >> 6) << 6;
+		backed_bitframe[bitindex+1] |= ((mask[7] & 0x40) >> 6) << 7;
+
+		backed_bitframe[bitindex+2] = (mask[0] & 0x20) >> 5;
+		backed_bitframe[bitindex+2] |= ((mask[1] & 0x20) >> 5) << 1;
+		backed_bitframe[bitindex+2] |= ((mask[2] & 0x20) >> 5) << 2;
+		backed_bitframe[bitindex+2] |= ((mask[3] & 0x20) >> 5) << 3;
+		backed_bitframe[bitindex+2] |= ((mask[4] & 0x20) >> 5) << 4;
+		backed_bitframe[bitindex+2] |= ((mask[5] & 0x20) >> 5) << 5;
+		backed_bitframe[bitindex+2] |= ((mask[6] & 0x20) >> 5) << 6;
+		backed_bitframe[bitindex+2] |= ((mask[7] & 0x20) >> 5) << 7;
+
+		backed_bitframe[bitindex+3] = (mask[0] & 0x10) >> 4;
+		backed_bitframe[bitindex+3] |= ((mask[1] & 0x10) >> 4) << 1;
+		backed_bitframe[bitindex+3] |= ((mask[2] & 0x10) >> 4) << 2;
+		backed_bitframe[bitindex+3] |= ((mask[3] & 0x10) >> 4) << 3;
+		backed_bitframe[bitindex+3] |= ((mask[4] & 0x10) >> 4) << 4;
+		backed_bitframe[bitindex+3] |= ((mask[5] & 0x10) >> 4) << 5;
+		backed_bitframe[bitindex+3] |= ((mask[6] & 0x10) >> 4) << 6;
+		backed_bitframe[bitindex+3] |= ((mask[7] & 0x10) >> 4) << 7;
+
+		backed_bitframe[bitindex+4] = (mask[0] & 0x08) >> 3;
+		backed_bitframe[bitindex+4] |= ((mask[1] & 0x08) >> 3) << 1;
+		backed_bitframe[bitindex+4] |= ((mask[2] & 0x08) >> 3) << 2;
+		backed_bitframe[bitindex+4] |= ((mask[3] & 0x08) >> 3) << 3;
+		backed_bitframe[bitindex+4] |= ((mask[4] & 0x08) >> 3) << 4;
+		backed_bitframe[bitindex+4] |= ((mask[5] & 0x08) >> 3) << 5;
+		backed_bitframe[bitindex+4] |= ((mask[6] & 0x08) >> 3) << 6;
+		backed_bitframe[bitindex+4] |= ((mask[7] & 0x08) >> 3) << 7;
+
+		backed_bitframe[bitindex+5] = (mask[0] & 0x04) >> 2;
+		backed_bitframe[bitindex+5] |= ((mask[1] & 0x04) >> 2) << 1;
+		backed_bitframe[bitindex+5] |= ((mask[2] & 0x04) >> 2) << 2;
+		backed_bitframe[bitindex+5] |= ((mask[3] & 0x04) >> 2) << 3;
+		backed_bitframe[bitindex+5] |= ((mask[4] & 0x04) >> 2) << 4;
+		backed_bitframe[bitindex+5] |= ((mask[5] & 0x04) >> 2) << 5;
+		backed_bitframe[bitindex+5] |= ((mask[6] & 0x04) >> 2) << 6;
+		backed_bitframe[bitindex+5] |= ((mask[7] & 0x04) >> 2) << 7;
+
+		backed_bitframe[bitindex+6] = (mask[0] & 0x02) >> 1;
+		backed_bitframe[bitindex+6] |= ((mask[1] & 0x02) >> 1) << 1;
+		backed_bitframe[bitindex+6] |= ((mask[2] & 0x02) >> 1) << 2;
+		backed_bitframe[bitindex+6] |= ((mask[3] & 0x02) >> 1) << 3;
+		backed_bitframe[bitindex+6] |= ((mask[4] & 0x02) >> 1) << 4;
+		backed_bitframe[bitindex+6] |= ((mask[5] & 0x02) >> 1) << 5;
+		backed_bitframe[bitindex+6] |= ((mask[6] & 0x02) >> 1) << 6;
+		backed_bitframe[bitindex+6] |= ((mask[7] & 0x02) >> 1) << 7;
+
+		backed_bitframe[bitindex+7] = (mask[0] & 0x01);
+		backed_bitframe[bitindex+7] |= ((mask[1] & 0x01)) << 1;
+		backed_bitframe[bitindex+7] |= ((mask[2] & 0x01)) << 2;
+		backed_bitframe[bitindex+7] |= ((mask[3] & 0x01)) << 3;
+		backed_bitframe[bitindex+7] |= ((mask[4] & 0x01)) << 4;
+		backed_bitframe[bitindex+7] |= ((mask[5] & 0x01)) << 5;
+		backed_bitframe[bitindex+7] |= ((mask[6] & 0x01)) << 6;
+		backed_bitframe[bitindex+7] |= ((mask[7] & 0x01)) << 7;
 
 
 #if(0)
