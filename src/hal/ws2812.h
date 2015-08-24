@@ -21,5 +21,6 @@
 
 /* interfaces */
 extern void ws2812_init( void );
+extern void ws2812_send( void );
 
 #endif /* SRC_HAL_WS2812_H_ */

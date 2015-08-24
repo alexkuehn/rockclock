@@ -43,22 +43,22 @@ void hello_process( void )
 void led_process( void )
 {
 	static uint8_t col = 0;
-	static uint8_t prevcol = 11;
 
-	if( ws2812_get_transferring() == 0)
+	if( ws2812_get_updating() == 0)
 	{
-		ws2812_set(0, col, prng_get(), prng_get(), prng_get());
-		ws2812_set(0, prevcol, 0x00, 0x00, 0x00);
-
-		col++;
-		prevcol = (col-1) % 12;
-
-		if( col == 12)
+		for( col=0; col < 12; col++)
 		{
-			col = 0;
-			prevcol = 11;
+			if( col== 6)
+			{
+				ws2812_set_pixel(0, col, 0, 0xFF, 0);
+
+			}
+			else
+			{
+				ws2812_set_pixel(0, col, 0, col+1, 0);
+			}
 		}
 
-		ws2812_send();
+		ws2812_update();
 	}
 }
