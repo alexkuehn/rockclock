@@ -19,7 +19,7 @@
 {                                                  \
    { scheduler_period_ms(1000),  &blink_process  },       \
    { scheduler_period_ms(3000), &hello_process   },      \
-   { scheduler_period_ms(50),	&led_process	}, 	\
+   { scheduler_period_ms(1000),	&led_process	}, 	\
 }
 
 #define PROCESS_BLINK 0

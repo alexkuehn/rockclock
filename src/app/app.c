@@ -43,22 +43,31 @@ void hello_process( void )
 void led_process( void )
 {
 	static uint8_t col = 0;
+	static uint8_t step = 0;
 
-	if( ws2812_get_updating() == 0)
+	if( step == 0)
 	{
+
 		for( col=0; col < 12; col++)
 		{
-			if( col== 6)
-			{
-				ws2812_set_pixel(0, col, 0, 0xFF, 0);
+			ws2812_set_pixel(0, col, 0x01, 0, 0);
 
-			}
-			else
-			{
-				ws2812_set_pixel(0, col, 0, col+1, 0);
-			}
 		}
-
-		ws2812_update();
+		step =1;
 	}
+	else
+	{
+		for( col=0; col < 12; col++)
+				{
+					ws2812_set_pixel(0, col, 0x0, 0x01, 0);
+
+				}
+		step=0;
+
+	}
+
+
+	ws2812_update();
+
+
 }

@@ -231,6 +231,8 @@ void ws2812_send( void )
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL3, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL4, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
 
+	dma_set_memory_address( DMA1, DMA_CHANNEL4, (uint32_t)actual_bitframe);
+
 	dma_set_number_of_data( DMA1, DMA_CHANNEL2, WS2812_BUFFERSIZE);
 	dma_set_number_of_data( DMA1, DMA_CHANNEL3, WS2812_BUFFERSIZE);
 	dma_set_number_of_data( DMA1, DMA_CHANNEL4, WS2812_BUFFERSIZE);
@@ -260,17 +262,10 @@ void ws2812_send( void )
 
 void tim3_isr(void)
 {
-	static uint8_t *bftemp;
+	uint8_t *bftemp;
 	timer_clear_flag(TIM3, TIM_SR_UIF);
 
-	if(update_flag == 1)
-	{
-		bftemp = actual_bitframe;
-		actual_bitframe = drawing_bitframe;
-		drawing_bitframe = bftemp;
 
-		update_flag = 0;
-	}
 
 	if( waitcnt < NR_OF_WAITCOUNTS)
 	{
@@ -285,7 +280,14 @@ void tim3_isr(void)
 		timer_disable_irq(TIM3, TIM_DIER_UIE);
 
 		transferring = 0;
+		if(update_flag == 1)
+		{
+			bftemp = actual_bitframe;
+			actual_bitframe = drawing_bitframe;
+			drawing_bitframe = bftemp;
 
+			update_flag = 0;
+		}
 		ws2812_send();
 	}
 }
