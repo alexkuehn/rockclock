@@ -10,6 +10,13 @@
 
 #include <stdint.h>
 
-extern void usart_transmit( uint16_t data );
+typedef enum {
+	E_OK = 0,
+	E_FULL = -1
+} usart_status_t;
+
+extern void usart_transmit_blocking( uint16_t data );
+extern usart_status_t usart_transmit( uint8_t * data, uint16_t length);
+extern void usart_config_baudrate( uint32_t baudrate );
 
 #endif /* SRC_HAL_USART_IF_H_ */

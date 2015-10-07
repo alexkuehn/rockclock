@@ -23,21 +23,25 @@ static uint8_t low_pattern = 0x00;
 static uint8_t high_pattern = 0xFF;
 
 static uint8_t frame_pattern[3*NR_OF_LEDS_PER_CH*NR_OF_ROWS];
+
 static uint8_t bitframe_pattern[WS2812_BUFFERSIZE];
-static uint8_t bitframe_pattern_back[WS2812_BUFFERSIZE];
 static uint8_t bitframe_pattern_draw[WS2812_BUFFERSIZE];
 
 static uint8_t waitcnt = 0;
 
 static uint8_t *actual_bitframe = bitframe_pattern;
-static uint8_t *backed_bitframe = bitframe_pattern_back;
 static uint8_t *drawing_bitframe = bitframe_pattern_draw;
 
-static volatile uint8_t  transferring= 0;
 static volatile uint8_t update_flag = 0;
 
 void ws2812_clear( void )
 {
+	uint32_t i;
+
+	for( i = 0; i < (3*NR_OF_LEDS_PER_CH*NR_OF_ROWS); i++ )
+	{
+		frame_pattern[i] = 0;
+	}
 }
 
 void ws2812_set_pixel( uint8_t row, uint8_t col, uint8_t red, uint8_t green, uint8_t blue )
@@ -60,9 +64,6 @@ void ws2812_update( void )
 	uint8_t frameval;
 
 	/* spinlock until buffer manipulation is ready */
-
-
-	io_on( GPIOC, GPIO9);
 
 	colpos = 0;
 	incol = 0;
@@ -101,7 +102,6 @@ void ws2812_update( void )
 	}
 
 	update_flag = 1;
-	io_off( GPIOC, GPIO9);
 }
 
 void ws2812_init( void )
@@ -112,8 +112,6 @@ void ws2812_init( void )
 	{
 		bitframe_pattern[i] = 0;
 		bitframe_pattern_draw[i] = 0;
-		bitframe_pattern_back[i] = 0;
-
 	}
 
 	for( i=0; i < (3*NR_OF_LEDS_PER_CH*NR_OF_ROWS); i++)
@@ -197,11 +195,6 @@ void ws2812_init( void )
 
 void pend_sv_handler( void )
 {
-	uint32_t i;
-
-
-
-
 
 }
 
@@ -223,9 +216,6 @@ void dma1_channel2_3_isr( void )
 
 void ws2812_send( void )
 {
-	transferring = 1;
-
-	io_on( GPIOC, GPIO10);
 
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL2, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL3, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
@@ -274,20 +264,22 @@ void tim3_isr(void)
 	}
 	else
 	{
-		io_off( GPIOC, GPIO10);
+
 		waitcnt = 0;
 		timer_disable_counter(TIM3);
 		timer_disable_irq(TIM3, TIM_DIER_UIE);
 
-		transferring = 0;
+
 		if(update_flag == 1)
 		{
+
 			bftemp = actual_bitframe;
 			actual_bitframe = drawing_bitframe;
 			drawing_bitframe = bftemp;
 
 			update_flag = 0;
 		}
+
 		ws2812_send();
 	}
 }

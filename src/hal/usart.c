@@ -5,11 +5,22 @@
  *      Author: alex
  */
 
+#include "usart_if.h"
 #include "usart_config.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/cm3/nvic.h>
+
+#include "../services/ringbuffer_if.h"
+
+#include "../hal/io_if.h"
+
+static uint8_t rxbuffer_store[USART_BUFFERSIZE];
+static uint8_t txbuffer_store[USART_BUFFERSIZE];
+
+static ringbuffer_t rxbuffer,txbuffer;
 
 void usart_init( void )
 {
@@ -20,10 +31,10 @@ void usart_init( void )
 	rcc_periph_clock_enable(RCC_USART2);
 
 	/* Setup GPIO pins for USART2 transmit. */
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2 );
+	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2 | GPIO3 );
 
 	/* Setup USART1 TX pin as alternate function. */
-	gpio_set_af(GPIOA, GPIO_AF1, GPIO2 );
+	gpio_set_af(GPIOA, GPIO_AF1, GPIO2 | GPIO3 );
 
 	/* Setup USART2 parameters. */
 	usart_set_baudrate(USART2, BAUDRATE);
@@ -31,14 +42,55 @@ void usart_init( void )
 	usart_set_parity(USART2, USART_PARITY_NONE);
 	usart_set_stopbits(USART2, USART_CR2_STOP_1_0BIT);
 
-	usart_set_mode(USART2, USART_MODE_TX);
+	usart_set_mode(USART2, USART_MODE_TX_RX);
 	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
 
+	/* init comm buffers */
+	ringbuffer_init( &rxbuffer, rxbuffer_store, USART_BUFFERSIZE);
+	ringbuffer_init( &txbuffer, txbuffer_store, USART_BUFFERSIZE);
+
+
+	nvic_enable_irq( NVIC_USART2_IRQ );
+	usart_disable_rx_interrupt( USART2);
+	usart_disable_tx_interrupt( USART2);
 	/* Finally enable the USART. */
 	usart_enable(USART2);
 }
 
-void usart_transmit( uint16_t data )
+void usart2_isr(void)
+{
+	uint8_t data;
+
+	if( (USART2_ISR & USART_ISR_TXE) != 0)
+	{
+
+		if( ringbuffer_get_used(&txbuffer) > 0)
+		{
+			io_on( LED_BLUE_PORT, LED_BLUE_PIN);
+			ringbuffer_get_data( &txbuffer, &data, 1);
+			usart_send( USART2, data);
+		}
+		else
+		{
+			io_off( LED_BLUE_PORT, LED_BLUE_PIN);
+			usart_disable_tx_interrupt( USART2);
+		}
+	}
+}
+
+void usart_config_baudrate( uint32_t baudrate )
+{
+	usart_set_baudrate( USART2, baudrate);
+}
+
+void usart_transmit_blocking( uint16_t data )
 {
 	usart_send_blocking(USART2, data);
+}
+
+usart_status_t usart_transmit( uint8_t* data, uint16_t length)
+{
+	ringbuffer_put_data( &txbuffer, data, length);
+	usart_enable_tx_interrupt(USART2);
+	return E_OK;
 }
