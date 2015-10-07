@@ -51,7 +51,7 @@ void usart_init( void )
 
 
 	nvic_enable_irq( NVIC_USART2_IRQ );
-	usart_disable_rx_interrupt( USART2);
+	usart_enable_rx_interrupt( USART2);
 	usart_disable_tx_interrupt( USART2);
 	/* Finally enable the USART. */
 	usart_enable(USART2);
@@ -66,16 +66,26 @@ void usart2_isr(void)
 
 		if( ringbuffer_get_used(&txbuffer) > 0)
 		{
-			io_on( LED_BLUE_PORT, LED_BLUE_PIN);
 			ringbuffer_get_data( &txbuffer, &data, 1);
 			usart_send( USART2, data);
 		}
 		else
 		{
-			io_off( LED_BLUE_PORT, LED_BLUE_PIN);
 			usart_disable_tx_interrupt( USART2);
 		}
 	}
+
+	if( (USART2_ISR & USART_ISR_RXNE) != 0)
+	{
+		data = usart_recv( USART2);
+		if( ringbuffer_get_free(&rxbuffer) > 0)
+		{
+			io_toggle( LED_BLUE_PORT, LED_BLUE_PIN);
+			ringbuffer_put_data( &rxbuffer, &data, 1);
+
+		}
+	}
+
 }
 
 void usart_config_baudrate( uint32_t baudrate )
@@ -93,4 +103,22 @@ usart_status_t usart_transmit( uint8_t* data, uint16_t length)
 	ringbuffer_put_data( &txbuffer, data, length);
 	usart_enable_tx_interrupt(USART2);
 	return E_OK;
+}
+
+uint16_t usart_receive( uint8_t *buffer, uint16_t length)
+{
+	uint16_t reallength;
+
+	reallength = ringbuffer_get_used( &rxbuffer);
+
+	if( reallength > length )
+	{
+		reallength = length;
+	}
+
+	if( reallength > 0)
+	{
+		ringbuffer_get_data(&rxbuffer, buffer, reallength);
+	}
+	return reallength;
 }

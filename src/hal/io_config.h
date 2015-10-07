@@ -13,4 +13,7 @@
 #define LED_BLUE_PORT 	GPIOC
 #define LED_BLUE_PIN  	GPIO8
 
+#define HC05_CMD_PORT	GPIOB
+#define HC05_CMD_PIN	GPIO1
+
 #endif /* SRC_HAL_IO_CONFIG_H_ */

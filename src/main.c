@@ -36,8 +36,9 @@ int main(void)
 	while (1) {
 		scheduler_process();
 
-
-
+#ifdef LOOP_CALLBACK
+		LOOP_CALLBACK();
+#endif
 	}
 
 	return 0;

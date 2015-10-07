@@ -12,8 +12,6 @@
 
 #include "../services/prng_if.h"
 
-const uint8_t str[] ="Hallo Susanne, ich liebe Dich!";
-const uint8_t delimiter[] = {'\r', '\n'};
 
 void app_init(void)
 {
@@ -26,12 +24,6 @@ void blink_process( void )
 #if(0)
 	io_toggle( LED_BLUE_PORT, LED_BLUE_PIN);
 #endif
-}
-
-void hello_process( void )
-{
-	usart_transmit((uint8_t *)str, 30);
-	usart_transmit((uint8_t *)delimiter,2);
 }
 
 void led_process( void )
@@ -59,3 +51,19 @@ void led_process( void )
 		clock = 0;
 	}
 }
+
+void loop_process(void)
+{
+	uint8_t inputdata[8];
+	uint16_t readlen;
+
+	readlen = usart_receive( inputdata, 8);
+
+	if( readlen > 0)
+	{
+		usart_transmit( inputdata, readlen);
+	}
+
+
+}
+

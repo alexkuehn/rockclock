@@ -6,6 +6,7 @@
  */
 
 #include "io_config.h"
+#include "../hal/io_if.h"
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
@@ -13,13 +14,17 @@ void io_init( void )
 {
 	/* Enable GPIOC clock for LED & USARTs. */
 	rcc_periph_clock_enable(RCC_GPIOC);
+	rcc_periph_clock_enable(RCC_GPIOB);
 
 	/* Setup GPIO pin GPIO8/9 on GPIO port C for LEDs. */
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_BLUE_PIN);
+	gpio_mode_setup(HC05_CMD_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, HC05_CMD_PIN);
 
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO9);
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO10);
 
+	io_off( LED_BLUE_PORT, LED_BLUE_PIN);
+	io_off( HC05_CMD_PORT, HC05_CMD_PIN);
 }
 
 void io_toggle( uint32_t port, uint16_t pos)
