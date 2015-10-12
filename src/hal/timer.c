@@ -26,13 +26,7 @@ void timer_init( void )
 
 uint32_t timer_get( void )
 {
-  uint32_t tickbuffer;
-
-  cpu_disable_int();
-  tickbuffer = timer_tick;
-  cpu_enable_int();
-
-  return tickbuffer;
+  return timer_tick;
 }
 
 /* system timer signal */

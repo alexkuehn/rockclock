@@ -16,6 +16,7 @@
 #include "../services/ringbuffer_if.h"
 
 #include "../hal/io_if.h"
+#include "../hal/timer_if.h"
 
 static uint8_t rxbuffer_store[USART_BUFFERSIZE];
 static uint8_t txbuffer_store[USART_BUFFERSIZE];
@@ -105,11 +106,21 @@ usart_status_t usart_transmit( uint8_t* data, uint16_t length)
 	return E_OK;
 }
 
-uint16_t usart_receive( uint8_t *buffer, uint16_t length)
+int16_t usart_receive( uint8_t *buffer, uint16_t length, uint32_t timeout)
 {
 	uint16_t reallength;
+	uint32_t timeouttrigger;
+	int16_t retval;
 
-	reallength = ringbuffer_get_used( &rxbuffer);
+	timeouttrigger = timer_get() + timeout;
+
+	do
+	{
+		reallength = ringbuffer_get_used( &rxbuffer);
+
+	}while( (timeout > 0) &&
+			(timeouttrigger > timer_get()) &&
+			(reallength < length) );
 
 	if( reallength > length )
 	{
@@ -119,6 +130,11 @@ uint16_t usart_receive( uint8_t *buffer, uint16_t length)
 	if( reallength > 0)
 	{
 		ringbuffer_get_data(&rxbuffer, buffer, reallength);
+		retval = reallength;
 	}
-	return reallength;
+	else
+	{
+		retval = -1;
+	}
+	return retval;
 }

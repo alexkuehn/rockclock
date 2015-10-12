@@ -54,16 +54,16 @@ void led_process( void )
 
 void loop_process(void)
 {
+	const uint8_t edata = 'T';
 	uint8_t inputdata[8];
-	uint16_t readlen;
+	int16_t readlen;
 
-	readlen = usart_receive( inputdata, 8);
+	readlen = usart_receive( inputdata, 8, 0);
 
 	if( readlen > 0)
 	{
 		usart_transmit( inputdata, readlen);
 	}
-
 
 }
 

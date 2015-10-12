@@ -13,7 +13,7 @@
 /* definition of schedule table */
 typedef struct
 {
-   uint16_t period;
+   uint32_t period;
    void (* periodic_cb)( void );
 } scheduletable_t;
 

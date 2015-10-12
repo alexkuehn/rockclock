@@ -17,7 +17,7 @@
 static const scheduletable_t scheduletable[] = schedule_cb_table;
 static const uint8_t scheduletable_size = SCHEDULETABLE_SIZE;
 
-static uint16_t tickstart[SCHEDULETABLE_SIZE];
+static uint32_t tickstart[SCHEDULETABLE_SIZE];
 static schedule_ctrl_state_t scheduler_state[SCHEDULETABLE_SIZE];
 static uint8_t schedule_runflag[SCHEDULETABLE_SIZE];
 
@@ -38,8 +38,8 @@ void scheduler_init()
 void scheduler_process()
 {
    uint8_t i;
-   uint16_t tickend, tickdiff;
-   uint16_t period;
+   uint32_t tickend, tickdiff;
+   uint32_t period;
 
 
    tickend = timer_get();
