@@ -12,10 +12,11 @@
 
 #include "../services/prng_if.h"
 
+#include "../com/bt_if.h"
 
 void app_init(void)
 {
-
+	bt_init();
 }
 
 
@@ -54,6 +55,7 @@ void led_process( void )
 
 void loop_process(void)
 {
+#if(0)
 	const uint8_t edata = 'T';
 	uint8_t inputdata[8];
 	int16_t readlen;
@@ -64,6 +66,6 @@ void loop_process(void)
 	{
 		usart_transmit( inputdata, readlen);
 	}
-
+#endif
 }
 

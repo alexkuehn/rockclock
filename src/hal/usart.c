@@ -138,3 +138,9 @@ int16_t usart_receive( uint8_t *buffer, uint16_t length, uint32_t timeout)
 	}
 	return retval;
 }
+
+void usart_flush( void )
+{
+	ringbuffer_flush( &rxbuffer);
+	ringbuffer_flush(&txbuffer);
+}

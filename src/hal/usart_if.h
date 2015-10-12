@@ -19,5 +19,6 @@ extern void usart_transmit_blocking( uint16_t data );
 extern usart_status_t usart_transmit( uint8_t * data, uint16_t length);
 extern int16_t usart_receive( uint8_t *buffer, uint16_t length, uint32_t timeout);
 extern void usart_config_baudrate( uint32_t baudrate );
+extern void usart_flush( void );
 
 #endif /* SRC_HAL_USART_IF_H_ */

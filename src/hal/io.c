@@ -15,6 +15,7 @@ void io_init( void )
 	/* Enable GPIOC clock for LED & USARTs. */
 	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_GPIOA);
 
 	/* Setup GPIO pin GPIO8/9 on GPIO port C for LEDs. */
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_BLUE_PIN);

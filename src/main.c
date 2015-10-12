@@ -29,8 +29,8 @@
 int main(void)
 {
 	hal_init();
-	app_init();
 	os_init();
+	app_init();
 
 
 	while (1) {
