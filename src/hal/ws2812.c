@@ -48,13 +48,13 @@ void ws2812_set_pixel( uint8_t row, uint8_t col, uint8_t red, uint8_t green, uin
 {
 	uint32_t index;
 
+
 	index = 3*NR_OF_LEDS_PER_CH*row;
 	index += 3*col;
 
 	frame_pattern[index] = green;
 	frame_pattern[index+1] = red;
 	frame_pattern[index+2] = blue;
-
 }
 
 void ws2812_update( void )
@@ -178,11 +178,11 @@ void ws2812_init( void )
     timer_disable_preload( TIM3 );
 
     timer_set_oc_mode( TIM3, TIM_OC1,TIM_OCM_FROZEN);
-    timer_set_oc_value( TIM3, TIM_OC1, 12);
+    timer_set_oc_value( TIM3, TIM_OC1, 19);
     timer_disable_oc_preload( TIM3, TIM_OC1);
 
     timer_set_oc_mode( TIM3, TIM_OC3,TIM_OCM_FROZEN);
-    timer_set_oc_value( TIM3, TIM_OC3, 24);
+    timer_set_oc_value( TIM3, TIM_OC3, 41);
     timer_disable_oc_preload( TIM3, TIM_OC3);
 
     nvic_set_priority( NVIC_TIM3_IRQ,1);
