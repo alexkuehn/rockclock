@@ -32,22 +32,43 @@ void led_process( void )
 	static uint8_t col = 0;
 	static uint8_t clock = 0;
 
-	for( col=0; col < 12; col++)
+	for( col=0; col < 60; col++)
 	{
 		if( col == clock )
 		{
-			ws2812_set_pixel(0, col, 0x1F, 0, 0);
+			ws2812_set_pixel(0, col, 0, 75, 75);
 		}
 		else
 		{
-			ws2812_set_pixel(0, col, 0x0, 0x03, 0);
+			if( (col % 15) == 0)
+			{
+				ws2812_set_pixel(0, col, 30, 0x00, 10);
+			}
+			else
+			{
+				if( (col % 5) == 0)
+				{
+					ws2812_set_pixel(0, col, 15, 0x00, 15);
+
+				}
+				else
+				{
+					ws2812_set_pixel(0, col, 10, 6, 0);
+				}
+			}
+
+			if( col == 30)
+			{
+				ws2812_set_pixel( 0, col , 15,15,15);
+			}
 		}
 	}
+
 
 	ws2812_update();
 
 	clock++;
-	if( clock == 12)
+	if( clock == 60)
 	{
 		clock = 0;
 	}
