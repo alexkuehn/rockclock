@@ -21,8 +21,11 @@ void io_init( void )
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_BLUE_PIN);
 	gpio_mode_setup(HC05_CMD_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, HC05_CMD_PIN);
 
+
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO9);
 	gpio_mode_setup(LED_BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO10);
+
+	gpio_mode_setup( DCF_IN_PORT, GPIO_MODE_INPUT, GPIO_PUPD_NONE, DCF_IN_PIN);
 
 	io_off( LED_BLUE_PORT, LED_BLUE_PIN);
 	io_off( HC05_CMD_PORT, HC05_CMD_PIN);
@@ -42,3 +45,9 @@ void io_off( uint32_t port, uint16_t pos)
 {
 	gpio_clear( port, pos);
 }
+
+uint8_t io_get( uint32_t port, uint16_t pos)
+{
+	return gpio_get( port, pos);
+}
+

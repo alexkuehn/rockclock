@@ -10,6 +10,7 @@
 #include "timer.h"
 #include "usart.h"
 #include "ws2812.h"
+#include "dcf_if.h"
 
 void hal_init( void )
 {
@@ -17,5 +18,6 @@ void hal_init( void )
   io_init();
   usart_init();
   timer_init();
+  dcf_init();
   ws2812_init();
 }

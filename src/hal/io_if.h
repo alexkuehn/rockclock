@@ -13,5 +13,6 @@
 extern void io_toggle( uint32_t port, uint16_t pos);
 extern void io_on( uint32_t port, uint16_t pos);
 extern void io_off( uint32_t port, uint16_t pos);
+extern uint8_t io_get( uint32_t port, uint16_t pos);
 
 #endif /* SRC_HAL_IO_IF_H_ */
