@@ -81,9 +81,7 @@ void usart2_isr(void)
 		data = usart_recv( USART2);
 		if( ringbuffer_get_free(&rxbuffer) > 0)
 		{
-			io_toggle( LED_BLUE_PORT, LED_BLUE_PIN);
 			ringbuffer_put_data( &rxbuffer, &data, 1);
-
 		}
 	}
 

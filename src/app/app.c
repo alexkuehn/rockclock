@@ -53,7 +53,7 @@ void led_process( void )
 				}
 				else
 				{
-					ws2812_set_pixel(0, col, 10, 6, 0);
+					ws2812_set_pixel(0, col, 1, 1, 0);
 				}
 			}
 

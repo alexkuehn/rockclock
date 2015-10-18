@@ -34,6 +34,8 @@ static const uint8_t BTCMD_RESET[] = "AT+RESET\r\n";
 static uint8_t response_buffer[RESPONSE_LENGTH];
 
 #define RESPONSE_TIMEOUT 200 /* ms */
+
+static uint8_t bt_ready = 0;
 void bt_init( void )
 {
 	uint8_t num_baudrates = sizeof(baudrates)/sizeof(uint32_t);
@@ -76,15 +78,22 @@ void bt_init( void )
 		received = usart_receive( response_buffer, RESPONSE_LENGTH, RESPONSE_TIMEOUT);
 	}
 
-	/* leave AT mode */
-	io_off( HC05_CMD_PORT, HC05_CMD_PIN);
+
 	/* send reset */
 	usart_transmit( (uint8_t *)BTCMD_RESET, BTCMD_RESET_LEN);
 	received = usart_receive( response_buffer, RESPONSE_LENGTH, RESPONSE_TIMEOUT);
-
+	/* leave AT mode */
+	io_off( HC05_CMD_PORT, HC05_CMD_PIN);
 	/* wait a bit */
 	delay( 100);
 	usart_config_baudrate( baudrates[0]);
 	usart_flush();
 
+	bt_ready = 1;
+
+}
+
+uint8_t bt_is_ready( void )
+{
+	return bt_ready;
 }

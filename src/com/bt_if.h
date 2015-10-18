@@ -11,6 +11,6 @@
 #include <stdint.h>
 
 extern void bt_init( void );
-
+extern uint8_t bt_is_ready( void );
 
 #endif /* SRC_COM_BT_IF_H_ */

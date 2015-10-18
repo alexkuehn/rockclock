@@ -16,7 +16,7 @@
 #define HC05_CMD_PORT	GPIOA
 #define HC05_CMD_PIN	GPIO1
 
-#define DCF_IN_PORT		GPIOA
+#define DCF_IN_PORT		GPIOC
 #define DCF_IN_PIN		GPIO0
 
 #endif /* SRC_HAL_IO_CONFIG_H_ */
