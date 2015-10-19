@@ -19,15 +19,53 @@
 
 #define DCF_DEBOUNCE 3
 
-#define DCF_STATE_SYNC 1400 /* ms */
+#define DCF_STATE_SYNC 1200 /* ms */
+#define DCF_STATE_MIN 500 /* ms */
+
+#define DCF_STATE_LO_MIN 70
+#define DCF_STATE_LO_MAX 130
+#define DCF_STATE_HI_MIN 160
+#define DCF_STATE_HI_MAX 230
+
+static volatile uint8_t dcf_second_flag = 0;
+static volatile uint64_t dcf_data_buf = 0;
+static volatile uint8_t dcf_data_new = 0;
 
 #if(CFG_DEBUG_DCF_SAMPLING)
 #include "../hal/usart_if.h"
 #include "../com/bt_if.h"
 #endif
-
+#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_PHY))
+	const uint8_t dbg_dcf_str[] = "D0";
+	#define DBG_DCF_STR_LEN 2
+#endif
+#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_SIG))
+	const uint8_t dbg_dcf_filter_str[] = "DF";
+	#define DBG_DCF_FILTER_STR_LEN 2
+#endif
+#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_SYNC_MACH))
+	const uint8_t dbg_dcf_sync_str[] = "DS";
+	#define DBG_DCF_SYNC_STR_LEN 2
+#endif
 extern void dcf_sample_process( void );
 extern void dcf_signal_process( uint8_t dcfsignal );
+
+uint8_t dcf_mailbox_data_get( uint64_t *rawdcf)
+{
+	uint8_t retval;
+
+	*rawdcf = dcf_data_buf;
+	retval = dcf_data_new;
+
+	dcf_data_new = 0;
+	return retval;
+}
+uint8_t dcf_mailbox_second_flag_get( void )
+{
+	uint8_t retval = dcf_second_flag;
+	dcf_second_flag = 0;
+	return retval;
+}
 
 void dcf_init( void )
 {
@@ -63,14 +101,6 @@ void dcf_sample_process( void )
 {
 	static int8_t on_cnt = 0;
 	static uint8_t filtered_sample = 0;
-#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_PHY))
-	const uint8_t dbg_dcf_str[] = "D0";
-	#define DBG_DCF_STR_LEN 2
-#endif
-#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_SIG))
-	const uint8_t dbg_dcf_filter_str[] = "DF";
-	#define DBG_DCF_FILTER_STR_LEN 2
-#endif
 	uint8_t sample;
 
 	sample = io_get(DCF_IN_PORT,  DCF_IN_PIN );
@@ -123,9 +153,8 @@ void dcf_sample_process( void )
 	{
 		io_off(LED_BLUE_PORT, LED_BLUE_PIN);
 	}
-
-	dcf_signal_process( filtered_sample);
 #endif
+	dcf_signal_process( filtered_sample);
 
 }
 
@@ -135,12 +164,15 @@ void dcf_signal_process( uint8_t dcfsignal )
 	static dcf_sig_state_t sig_state = DCF_SIG_INIT;
 	static uint32_t last_timestamp = 0;
 	static uint8_t last_sig_val = 0;
+	static uint64_t bitbuffer = 0;
+	static uint8_t bitpos = 0;
 	uint32_t timediff = 0;
 	uint32_t timeval;
 
 	/* evaluate if a signal transition took place */
 	if( dcfsignal != last_sig_val )
 	{
+
 		timeval = timer_get();
 		timediff = timeval - last_timestamp;
 		last_timestamp = timeval;
@@ -156,7 +188,80 @@ void dcf_signal_process( uint8_t dcfsignal )
 						/* we found the sync pause
 						 * now the next minute begins
 						 */
+						sig_state = DCF_SIG_SYNCED;
+						bitpos = 0;
+						bitbuffer = 0;
+					}
+				}
+				break;
 
+			case DCF_SIG_SYNCED:
+				if( dcfsignal == 1)
+				{
+					/* positive edge
+					 * begin of second marker
+					 * but check plausibility: if last transition time was max. DCF_STATE_MIN milliseconds before, signal is invalid
+					 *
+					 */
+					if( timediff < DCF_STATE_MIN)
+					{
+						/* signal not plausible: reinit */
+						sig_state = DCF_SIG_INIT;
+					}
+					else
+					{
+						/* begin of second mark
+						 * load the mailbox */
+						dcf_second_flag = 1;
+#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_SYNC_LED))
+						io_on(LED_BLUE_PORT, LED_BLUE_PIN);
+#endif
+
+						/* data packed fully received
+						 * load the data mailbox
+						 */
+						if( bitpos == 59)
+						{
+							bitpos = 0;
+							dcf_data_buf = bitbuffer;
+							dcf_data_new = 1;
+						}
+					}
+				}
+				else
+				{
+#if((CFG_DEBUG_DCF_SAMPLING & CFG_DCF_DEBUG_SYNC_LED))
+					io_off(LED_BLUE_PORT, LED_BLUE_PIN);
+#endif
+					/* negative edge
+					 * find bitlength and plausibilize
+					 */
+					if( (timediff > DCF_STATE_LO_MIN) && (timediff < DCF_STATE_HI_MAX))
+					{
+						/* plausible length */
+						if( timediff > DCF_STATE_HI_MIN)
+						{
+							bitbuffer |= (1 << bitpos);
+							bitpos++;
+						}
+						else
+						{
+							if( timediff < DCF_STATE_LO_MAX)
+							{
+								bitpos++;
+							}
+							else
+							{
+								/* signal not plausible: reinit */
+								sig_state = DCF_SIG_INIT;
+
+							}
+						}
+					}
+					else
+					{
+						/* signal not plausible: reinit */
+						sig_state = DCF_SIG_INIT;
 					}
 				}
 				break;
