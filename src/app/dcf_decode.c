@@ -34,7 +34,10 @@ void dcf_decode_process( void )
 			hours_bcd = BITOPS64_EXTRACT( rawframe, 29, 6);
 			minutes = dcf_decode_bcd( minutes_bcd);
 			hours = dcf_decode_bcd( hours_bcd);
-			clock_set( hours, minutes, 0);
+			if( (hours < 24) && (minutes < 60) )
+			{
+				clock_set( hours, minutes, 0);
+			}
 		}
 	}
 

@@ -30,7 +30,6 @@ void clock_update( void )
 	uint8_t i;
 #endif
 
-	dcf_decode_process();
 
 #if(CFG_DBG_DCF_BINARY)
 	dcfframe = dcf_decode_get_raw();
