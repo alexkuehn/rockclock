@@ -241,7 +241,7 @@ void dcf_signal_process( uint8_t dcfsignal )
 						/* plausible length */
 						if( timediff > DCF_STATE_HI_MIN)
 						{
-							bitbuffer |= (1 << bitpos);
+							bitbuffer |= ((uint64_t)1ULL << bitpos);
 							bitpos++;
 						}
 						else

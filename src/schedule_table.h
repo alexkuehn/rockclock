@@ -17,12 +17,11 @@
  */
 #define schedule_cb_table                          \
 {                                                  \
-   { scheduler_period_ms(1000),  &blink_process  },       \
-   { scheduler_period_ms(1000),	&led_process	}, 	\
+   { scheduler_period_ms(1000),	&clock_process	}, 	\
 }
 
-#define PROCESS_BLINK 0
-#define PROCESS_LED 1
+#define PROCESS_CLOCK 0
+
 
 
 #endif /* SRC_SCHEDULE_TABLE_H_ */
