@@ -15,6 +15,8 @@
 #include "../app/clock_if.h"
 
 static uint64_t rawframe = 0;
+static dcftime_t last_decoded_time = {0,0};
+
 
 void dcf_decode_process( void )
 {
@@ -36,12 +38,69 @@ void dcf_decode_process( void )
 			hours = dcf_decode_bcd( hours_bcd);
 			if( (hours < 24) && (minutes < 60) )
 			{
-				clock_set( hours, minutes, 0);
+				/* if frame is plausible,
+				 * check plausibility of two consecutive frames
+				 * synchronize clock only when two frames are monotonic
+				 */
+				dcftime_t acttime;
+				acttime.h = hours;
+				acttime.m = minutes;
+				if( dcf_decode_eval_inter_frame_q( acttime, last_decoded_time)== 1)
+				{
+					clock_set( hours, minutes, 0);
+				}
+				last_decoded_time.h = hours;
+				last_decoded_time.m = minutes;
 			}
 		}
 	}
 
+}
 
+uint8_t dcf_decode_eval_inter_frame_q( dcftime_t act, dcftime_t last)
+{
+	uint8_t valid =1;
+	uint8_t hour_ovfl = 0;
+	if( last.m <59 )
+	{
+		if( act.m != (last.m+1))
+		{
+			valid = 0;
+		}
+
+	}
+	else
+	{
+		hour_ovfl = 1;
+		if( act.m != 0)
+		{
+			valid = 0;
+		}
+
+	}
+
+	if( hour_ovfl )
+	{
+		if( act.h == last.h )
+		{
+			valid = 0;
+		}
+		if( last.h < 23 )
+		{
+			if( act.h != (last.h+1))
+			{
+				valid = 0;
+			}
+		}
+		else
+		{
+			if( act.h != 0)
+			{
+				valid = 0;
+			}
+		}
+	}
+	return valid;
 }
 
 uint8_t dcf_decode_bcd( uint8_t input)
