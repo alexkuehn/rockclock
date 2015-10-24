@@ -14,7 +14,7 @@
 #include "bt_if.h"
 #include "bt.h"
 
-static const uint32_t baudrates[] = {115200, 9600};
+static const uint32_t baudrates[] = {115200, 9600, 38400};
 
 static const uint8_t BTCMD_AT[] = "AT\r\n";
 #define  BTCMD_AT_LEN 4
