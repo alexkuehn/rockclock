@@ -17,27 +17,38 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scheduler_if.h"
-#include "scheduler.h"
+/* external standard includes */
+#include <stdint.h>
 
-#include "../schedule_table.h"
+/* external includes */
 
+/* project includes */
 #include "../hal/timer_if.h"
 
+/* component includes */
+#include "scheduler_if.h"
+#include "scheduler.h"
+#include "../schedule_table.h"
 
+
+/** @brief calculate number of elements in scheduler table
+ *
+ */
 #define SCHEDULETABLE_SIZE (sizeof(scheduletable)/sizeof(scheduletable[0]))
-static const scheduletable_t scheduletable[] = schedule_cb_table;
-static const uint8_t scheduletable_size = SCHEDULETABLE_SIZE;
 
-static uint32_t tickstart[SCHEDULETABLE_SIZE];
-static schedule_ctrl_state_t scheduler_state[SCHEDULETABLE_SIZE];
-static uint8_t schedule_runflag[SCHEDULETABLE_SIZE];
+static const scheduletable_t scheduletable[] = schedule_cb_table; 	/**< constant instance of scheduler table */
+static const uint8_t scheduletable_size = SCHEDULETABLE_SIZE;	  	/**< precalculated number of elements in schedule table */
+
+static uint32_t tickstart[SCHEDULETABLE_SIZE];						/**< table for last execution time tick */
+static schedule_ctrl_state_t scheduler_state[SCHEDULETABLE_SIZE];	/**< table for actual task state */
+static uint8_t schedule_runflag[SCHEDULETABLE_SIZE];				/**< mark table for upcoming running tasks */
 
 
 void scheduler_init()
 {
    uint8_t i;
 
+   /* initialize the scheduling time tables */
    for( i = 0; i < scheduletable_size; i++ )
    {
       tickstart[i] = timer_get();
@@ -59,7 +70,7 @@ void scheduler_process()
     * obtain consistent timeline
     */
 
-   /* evaluate which tasks should be executed */
+   /* evaluate which tasks should be executed and mark them */
    for( i = 0; i < scheduletable_size; i++ )
    {
 
@@ -74,7 +85,7 @@ void scheduler_process()
       }
    }
 
-   /* execute the tasks */
+   /* execute the tasks, which are marked for running */
    for( i = 0; i < scheduletable_size; i++ )
    {
       if( (schedule_runflag[i] == 1) &&

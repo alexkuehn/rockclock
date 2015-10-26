@@ -17,13 +17,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
+#include <stdint.h>
+
+/* external includes */
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/cortex.h>
 
+/* project includes */
+
+/* component includes */
+
+
 void cpu_init( void )
 {
-	/* initialize the clock */
+	/* initialize the system clock with standard 48MHz PLL */
 	rcc_clock_setup_in_hsi_out_48mhz();
 }
 

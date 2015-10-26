@@ -20,7 +20,16 @@
 #ifndef SRC_HAL_WS2812_CONFIG_H_
 #define SRC_HAL_WS2812_CONFIG_H_
 
-#define NR_OF_LEDS_PER_CH 60
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+#define NR_OF_LEDS_PER_CH 60	/**< length of a connected LED chain */
 
 
 

@@ -17,7 +17,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
 #include <stdint.h>
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
 
 uint8_t prng_get( void )
 {

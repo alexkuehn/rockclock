@@ -20,6 +20,18 @@
 #ifndef SRC_HAL_USART_H_
 #define SRC_HAL_USART_H_
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief initialize the USART component
+ *
+ */
 extern void usart_init( void );
 
 #endif /* SRC_HAL_USART_H_ */

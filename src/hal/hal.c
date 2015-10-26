@@ -17,6 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
 #include "cpu.h"
 #include "io.h"
 #include "timer.h"
@@ -24,12 +29,16 @@
 #include "ws2812.h"
 #include "dcf_if.h"
 
+/* component includes */
+
+
 void hal_init( void )
 {
-  cpu_init();
-  io_init();
-  usart_init();
-  timer_init();
-  dcf_init();
-  ws2812_init();
+	/* initialize the HAL subcomponents */
+	cpu_init();
+	io_init();
+	usart_init();
+	timer_init();
+	dcf_init();
+	ws2812_init();
 }

@@ -17,18 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "timer.h"
+/* external standard includes */
+#include <stdint.h>
 
-#include "../hal/cpu_if.h"
-
+/* external includes */
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/rcc.h>
 
-static volatile uint32_t timer_tick;
+/* project includes */
+#include "../hal/cpu_if.h"
+
+/* component includes */
+#include "timer.h"
+
+static volatile uint32_t timer_tick;	/**< actual timer tick value */
 
 void timer_init( void )
 {
+	/* configure system tick timer */
 	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
 	STK_CVR=0;
 	systick_set_reload(rcc_ahb_frequency / HZ);
@@ -41,7 +48,10 @@ uint32_t timer_get( void )
   return timer_tick;
 }
 
-/* system timer signal */
+/** @brief SysTick callback
+ *
+ * callback for SysTick timer
+ */
 void sys_tick_handler( void )
 {
     timer_tick++;

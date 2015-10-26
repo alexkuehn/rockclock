@@ -20,7 +20,17 @@
 #ifndef SRC_HAL_CPU_H_
 #define SRC_HAL_CPU_H_
 
-/* interface: initialize cpu */
+/* external standard includes */
+#include <stdint.h>
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+/** @brief initialize CPU subcomponent
+ */
 extern void cpu_init( void );
 
 

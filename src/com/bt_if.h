@@ -20,9 +20,27 @@
 #ifndef SRC_COM_BT_IF_H_
 #define SRC_COM_BT_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief initialize the bluetooth component
+ *
+ */
 extern void bt_init( void );
+
+/** @brief get bluetooth initialization state
+ *
+ * gets the state of the initialization of bluetooth component
+ *
+ * @return boolean state, True if initialized
+ */
 extern uint8_t bt_is_ready( void );
 
 #endif /* SRC_COM_BT_IF_H_ */

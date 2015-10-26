@@ -20,7 +20,21 @@
 #ifndef SRC_APP_CLOCK_H_
 #define SRC_APP_CLOCK_H_
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief increment internal clock by second
+ */
 extern void clock_tick( void );
+
+/** @brief display the clock on WS2812 ring
+ */
 extern void clock_display( void);
 
 #endif /* SRC_APP_CLOCK_H_ */

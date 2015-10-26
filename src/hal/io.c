@@ -17,10 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io_config.h"
-#include "../hal/io_if.h"
+/* external standard includes */
+
+/* external includes */
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+
+/* project includes */
+
+/* component includes */
+#include "io_config.h"
+#include "../hal/io_if.h"
+
 
 void io_init( void )
 {

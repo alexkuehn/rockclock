@@ -17,14 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
 #include "../hal/usart_if.h"
 #include "../hal/ws2812_if.h"
 #include "../com/bt_if.h"
 #include "../hal/dcf_if.h"
+#include "../app/clock_if.h"
 
+/* component includes */
 #include "app_config.h"
 
-#include "../app/clock_if.h"
 
 
 void app_init(void)

@@ -20,7 +20,16 @@
 #ifndef SRC_HAL_USART_CONFIG_H_
 #define SRC_HAL_USART_CONFIG_H_
 
-#define BAUDRATE	115200
-#define USART_BUFFERSIZE 64
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+#define BAUDRATE	115200		/**< default baudrate for USART communication */
+#define USART_BUFFERSIZE 64		/**< size of communication ringbuffers (RX,TX) */
 
 #endif /* SRC_HAL_USART_CONFIG_H_ */

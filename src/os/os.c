@@ -17,14 +17,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
 #include "../hal/cpu_if.h"
 #include "../hal/timer_if.h"
+#include "../os/scheduler.h"
+
+/* component includes */
+
 void os_init( void )
 {
-  scheduler_init();
+	/* initialize the os subcomponents */
+	scheduler_init();
 
-  /* start the interrupt system */
-  cpu_enable_int();
+	/* start the interrupt system */
+	cpu_enable_int();
 }
 
 void delay( uint32_t millis)

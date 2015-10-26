@@ -20,7 +20,17 @@
 #ifndef SRC_HAL_IO_H_
 #define SRC_HAL_IO_H_
 
-/* interface: initialize IO  */
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief initialize IO subcomponent
+ */
 extern void io_init( void );
 
 #endif /* SRC_HAL_IO_H_ */

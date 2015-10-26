@@ -20,8 +20,16 @@
 #ifndef SRC_HAL_IO_CONFIG_H_
 #define SRC_HAL_IO_CONFIG_H_
 
+/* external standard includes */
+
+/* external includes */
 #include <libopencm3/stm32/gpio.h>
 
+/* project includes */
+
+/* component includes */
+
+/* --> port and pin definitions */
 #define LED_BLUE_PORT 	GPIOC
 #define LED_BLUE_PIN  	GPIO8
 
@@ -30,5 +38,6 @@
 
 #define DCF_IN_PORT		GPIOC
 #define DCF_IN_PIN		GPIO0
+/* <-- port and pin definitions */
 
 #endif /* SRC_HAL_IO_CONFIG_H_ */

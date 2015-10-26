@@ -17,14 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+#include "../hal/ws2812_if.h"
+#include "../app/dcf_decode_if.h"
+
+/* component includes */
 #include "clock_if.h"
 #include "clock.h"
 #include "clock_config.h"
-#include "../hal/ws2812_if.h"
 
-#include "../app/dcf_decode_if.h"
-
-static clock_t running_time = {0,0,0};
+static clock_t running_time = {0,0,0};	/**< actual time object */
 
 void clock_set( uint8_t h, uint8_t m, uint8_t s)
 {
@@ -34,6 +40,7 @@ void clock_set( uint8_t h, uint8_t m, uint8_t s)
 }
 void clock_update( void )
 {
+	/* try to decode the DCF value */
 	dcf_decode_process();
 #if(CFG_DBG_DCF_BINARY)
 	uint64_t dcfframe = 0;
@@ -69,7 +76,9 @@ void clock_update( void )
 
 	ws2812_update();
 #endif
+	/* increment the clock */
 	clock_tick();
+	/* show clock */
 	clock_display();
 }
 

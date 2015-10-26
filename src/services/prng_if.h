@@ -20,8 +20,19 @@
 #ifndef SRC_SERVICES_PRNG_IF_H_
 #define SRC_SERVICES_PRNG_IF_H_
 
-/* interface: get a pseudo random number
- * returns: 8bit PRN
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+/** @brief generate 8bit pseudo random number
+ *
+ * generates a pseudo random number with 8bit length
+ *
+ * @return 8bit pseudo random number
  */
 extern uint8_t prng_get( void );
 

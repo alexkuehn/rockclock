@@ -20,10 +20,37 @@
 #ifndef SRC_HAL_DCF_IF_H_
 #define SRC_HAL_DCF_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief initialize DCF receiver component
+ */
 extern void dcf_init( void );
+
+/** @brief get new second marker
+ *
+ * gets a new second marker. When the marker was fetched, the mailbox gets empty until new
+ * second marker arrives
+ *
+ * @return True:second marker found since last fetch; False: no new second
+ */
 extern uint8_t dcf_mailbox_second_flag_get( void );
+
+/** @brief get new decoded DCF77 frame
+ *
+ * gets a new DCF77 frame within a 64bit value (bits0-59) from the decoder mailbox
+ *
+ * @param[out] rawdcf pointer to 64bit memory location where new frame shoud be stored
+ *
+ * @return True:new frame available; False: no new frame available
+ */
 extern uint8_t dcf_mailbox_data_get( uint64_t *rawdcf);
 
 

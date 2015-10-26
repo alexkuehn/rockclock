@@ -20,11 +20,52 @@
 #ifndef SRC_HAL_IO_IF_H_
 #define SRC_HAL_IO_IF_H_
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
 #include "io_config.h"
 
+
+/** @brief toggle IO pin
+ *
+ * toggles the output of an IO pin
+ *
+ * @param[in] port GPIO port
+ *
+ * @param[in] pos GPIO pin position
+ */
 extern void io_toggle( uint32_t port, uint16_t pos);
+
+/** @brief switch IO pin on
+ *
+ * switches the output of an IO pin to state ON
+ *
+ * @param[in] port GPIO port
+ *
+ * @param[in] pos GPIO pin position
+ */
 extern void io_on( uint32_t port, uint16_t pos);
+
+/** @brief switch IO pin off
+ *
+ * switches the output of an IO pin to state OFF
+ *
+ * @param[in] port GPIO port
+ *
+ * @param[in] pos GPIO pin position
+ */
 extern void io_off( uint32_t port, uint16_t pos);
+
+/** @brief get IO pin state
+ *
+ * gets the state of an IO pin
+ *
+ * @return Boolean state of an IO pin
+ */
 extern uint8_t io_get( uint32_t port, uint16_t pos);
 
 #endif /* SRC_HAL_IO_IF_H_ */

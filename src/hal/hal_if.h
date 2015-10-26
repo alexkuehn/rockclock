@@ -20,9 +20,18 @@
 #ifndef SRC_HAL_HAL_IF_H_
 #define SRC_HAL_HAL_IF_H_
 
-#define UART_BAUD_RATE 9600
+/* external standard includes */
 
-/* interface: initialize hardware components
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief init hal component
+ *
+ * initialize the hardware abstraction layer component
  */
 extern void hal_init( void );
 

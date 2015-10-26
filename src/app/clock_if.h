@@ -20,19 +20,39 @@
 #ifndef SRC_APP_CLOCK_IF_H_
 #define SRC_APP_CLOCK_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief clock time structure
+ *
+ */
 typedef struct
 {
-	uint8_t h;
-	uint8_t m;
-	uint8_t s;
+	uint8_t h;		/**< hours */
+	uint8_t m;		/**< minutes */
+	uint8_t s;		/**< seconds */
 } clock_t;
 
 
-
+/** @brief update the clock value
+ *
+ * needs to be called within a exact seond
+ */
 extern void clock_update( void );
 
+/** @brief set the clock time manually
+ *
+ * @param[in] h Hours
+ * @param[in] m Minutes
+ * @param[in] s Seconds
+ */
 extern void clock_set( uint8_t h, uint8_t m, uint8_t s);
 
 

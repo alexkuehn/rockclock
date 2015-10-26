@@ -20,7 +20,16 @@
 #ifndef SRC_APP_CLOCK_CONFIG_H_
 #define SRC_APP_CLOCK_CONFIG_H_
 
-#define CFG_DBG_DCF_BINARY 0
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+#define CFG_DBG_DCF_BINARY 0		/**< debug: display decoded DCF frame */
 
 
 #endif /* SRC_APP_CLOCK_CONFIG_H_ */

@@ -17,37 +17,45 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
 #include "../os/os_if.h"
 #include "../hal/io_if.h"
 #include "../hal/usart_if.h"
 
+/* component includes */
 #include "bt_if.h"
 #include "bt.h"
 
-static const uint32_t baudrates[] = {115200, 9600, 38400};
 
-static const uint8_t BTCMD_AT[] = "AT\r\n";
-#define  BTCMD_AT_LEN 4
-static const uint8_t BTCMD_SET_NAME[] = "AT+NAME=ROCKCLOCK\r\n";
-#define BTCMD_SET_NAME_LEN 19
+static const uint32_t baudrates[] = {115200, 9600, 38400};	/**< baudrates for probing */
 
-static const uint8_t BTCMD_SET_PW[] = "AT+PSWD=4223\r\n";
-#define BTCMD_SET_PW_LEN 14
+static const uint8_t BTCMD_AT[] = "AT\r\n";							/**< BT module init command */
+#define  BTCMD_AT_LEN 4												/**< BT module init command length*/
+static const uint8_t BTCMD_SET_NAME[] = "AT+NAME=ROCKCLOCK\r\n";	/**< BT module set name command */
+#define BTCMD_SET_NAME_LEN 19										/**< BT module set name command length */
 
-static const uint8_t BTCMD_SET_BAUD[] = "AT+UART=115200,0,0\r\n";
-#define BTCMD_SET_BAUD_LEN 20
+static const uint8_t BTCMD_SET_PW[] = "AT+PSWD=4223\r\n";			/**< BT module set password command */
+#define BTCMD_SET_PW_LEN 14											/**< BT module set password command length*/
 
-static const uint8_t BTCMD_RESET[] = "AT+RESET\r\n";
-#define BTCMD_RESET_LEN 10
+static const uint8_t BTCMD_SET_BAUD[] = "AT+UART=115200,0,0\r\n";	/**< BT module set baudrate command */
+#define BTCMD_SET_BAUD_LEN 20										/**< BT module set baudrate command  length*/
 
-#define RESPONSE_LENGTH 32
-static uint8_t response_buffer[RESPONSE_LENGTH];
+static const uint8_t BTCMD_RESET[] = "AT+RESET\r\n";				/**< BT module reset command */
+#define BTCMD_RESET_LEN 10											/**< BT module reset command length*/
 
-#define RESPONSE_TIMEOUT 200 /* ms */
+#define RESPONSE_LENGTH 32											/**< length of command response buffer */
 
-static uint8_t bt_ready = 0;
+static uint8_t response_buffer[RESPONSE_LENGTH];					/**< command response buffer */
+
+#define RESPONSE_TIMEOUT 200 	/**< timeout in [ms] for response */
+
+static uint8_t bt_ready = 0;	/**< bt module ready flag */
+
 void bt_init( void )
 {
 	uint8_t num_baudrates = sizeof(baudrates)/sizeof(uint32_t);

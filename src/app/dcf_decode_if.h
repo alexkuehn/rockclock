@@ -20,9 +20,23 @@
 #ifndef SRC_APP_DCF_DECODE_IF_H_
 #define SRC_APP_DCF_DECODE_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief decode a DCf frame
+ */
 extern void dcf_decode_process( void );
+
+/** @brief get raw DCF frame
+ * @return 64bit raw DCF frame
+ */
 extern uint64_t dcf_decode_get_raw( void );
 
 

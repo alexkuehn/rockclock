@@ -20,7 +20,21 @@
 #ifndef SRC_HAL_CPU_IF_H_
 #define SRC_HAL_CPU_IF_H_
 
+/* external standard includes */
+#include <stdint.h>
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+/** @brief disable interrupt
+ */
 extern void cpu_disable_int( void );
+
+/** @brief enable interrupt
+ */
 extern void cpu_enable_int( void );
 
 #endif /* SRC_HAL_CPU_IF_H_ */

@@ -17,17 +17,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
+
+/* project includes */
 #include "../hal/dcf_if.h"
-#include "dcf_decode_if.h"
-#include "dcf_decode.h"
-#include "dcf_decode_config.h"
 #include "../services/bitops_if.h"
 #include "../app/clock_if.h"
 
-static uint64_t rawframe = 0;
-static dcftime_t last_decoded_time = {0,0};
+/* component includes */
+#include "dcf_decode_if.h"
+#include "dcf_decode.h"
+#include "dcf_decode_config.h"
+
+
+static uint64_t rawframe = 0;					/**< actual raw DCF frame */
+static dcftime_t last_decoded_time = {0,0};		/**< last decoded time from valid frame */
 
 
 void dcf_decode_process( void )

@@ -17,27 +17,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "usart_if.h"
-#include "usart_config.h"
+/* external standard includes */
 
+/* external includes */
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
 
+/* project includes */
 #include "../services/ringbuffer_if.h"
-
 #include "../hal/io_if.h"
 #include "../hal/timer_if.h"
 
-static uint8_t rxbuffer_store[USART_BUFFERSIZE];
-static uint8_t txbuffer_store[USART_BUFFERSIZE];
+/* component includes */
+#include "usart_if.h"
+#include "usart_config.h"
 
-static ringbuffer_t rxbuffer,txbuffer;
+
+static uint8_t rxbuffer_store[USART_BUFFERSIZE];	/**<  receive ringbuffer storage */
+static uint8_t txbuffer_store[USART_BUFFERSIZE];	/**<  transmit ringbuffer storage */
+
+static ringbuffer_t rxbuffer,txbuffer;				/**< rx,tx ringbuffer objects */
 
 void usart_init( void )
 {
-	/* Enable GPIOC clock for LED & USARTs. */
+	/* Enable GPIOC clock for USARTs. */
 	rcc_periph_clock_enable(RCC_GPIOA);
 
 	/* Enable clocks for USART2. */
@@ -64,19 +69,30 @@ void usart_init( void )
 
 
 	nvic_enable_irq( NVIC_USART2_IRQ );
+	/* enable the receive interrupt
+	 * but disable the transmit ready interrupt, because we have nothing to send now
+	 */
 	usart_enable_rx_interrupt( USART2);
 	usart_disable_tx_interrupt( USART2);
 	/* Finally enable the USART. */
 	usart_enable(USART2);
 }
 
+/** @brief USART2 callback
+ *
+ * callback for USART2 interrupt
+ */
 void usart2_isr(void)
 {
 	uint8_t data;
 
+	/* TX buffer empty event */
 	if( (USART2_ISR & USART_ISR_TXE) != 0)
 	{
 
+		/* if we have something to send, load TX register with data
+		 * otherwise disable the TX buffer empty event interrupt
+		 */
 		if( ringbuffer_get_used(&txbuffer) > 0)
 		{
 			ringbuffer_get_data( &txbuffer, &data, 1);
@@ -88,9 +104,11 @@ void usart2_isr(void)
 		}
 	}
 
+	/* RX received event */
 	if( (USART2_ISR & USART_ISR_RXNE) != 0)
 	{
 		data = usart_recv( USART2);
+		/* fetch data and store in ringbuffer */
 		if( ringbuffer_get_free(&rxbuffer) > 0)
 		{
 			ringbuffer_put_data( &rxbuffer, &data, 1);
@@ -112,6 +130,9 @@ void usart_transmit_blocking( uint16_t data )
 usart_status_t usart_transmit( uint8_t* data, uint16_t length)
 {
 	ringbuffer_put_data( &txbuffer, data, length);
+	/* to start the non-blocking trnsmit, we need to enable the
+	 * TX buffer empty event in USART module
+	 */
 	usart_enable_tx_interrupt(USART2);
 	return E_OK;
 }

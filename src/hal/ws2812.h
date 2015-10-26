@@ -20,19 +20,32 @@
 #ifndef SRC_HAL_WS2812_H_
 #define SRC_HAL_WS2812_H_
 
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
 #include "ws2812_config.h"
 
 
-#define NR_OF_ROWS (8)
+#define NR_OF_ROWS (8)		/**< number of LED row chains */
 
-#define BITS_PER_LED 24
-#define WS2812_BUFFERSIZE (NR_OF_LEDS_PER_CH*BITS_PER_LED)
+#define BITS_PER_LED 24		/**< number of bits coded per LED */
+#define WS2812_BUFFERSIZE (NR_OF_LEDS_PER_CH*BITS_PER_LED)	/* size of LED unrolled buffer */
 
 
-#define NR_OF_WAITCOUNTS (18)
+#define NR_OF_WAITCOUNTS (18)	/**< count for timer overflows to define WS2812 sync pulse length */
 
-/* interfaces */
+/** @brief initialize WS2812 subcomponent
+ *
+ */
 extern void ws2812_init( void );
+
+/** @brief start the WS2812 protocol transfer process
+ *
+ */
 extern void ws2812_send( void );
 
 #endif /* SRC_HAL_WS2812_H_ */

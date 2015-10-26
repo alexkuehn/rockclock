@@ -20,12 +20,29 @@
 #ifndef SRC_OS_OS_IF_H_
 #define SRC_OS_OS_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
-/* interface: initialize os components
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief init os component
+ *
+ * initialize the operating system component
  */
 extern void os_init( void );
 
+/** @brief block amount of milliseconds
+ *
+ * wait an amount of milliseconds by blocking
+ *
+ * @param[in] millis amount of milliseconds to block
+ *
+ */
 extern void delay( uint32_t millis);
 
 #endif /* SRC_OS_OS_IF_H_ */

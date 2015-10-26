@@ -20,32 +20,55 @@
 #ifndef SRC_OS_SCHEDULER_IF_H_
 #define SRC_OS_SCHEDULER_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
-/* definition of schedule table */
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief schedule table
+ *
+ * schedule table descriptor
+ */
 typedef struct
 {
-   uint32_t period;
-   void (* periodic_cb)( void );
+   uint32_t period;					/**< period of task in milliseconds */
+   void (* periodic_cb)( void );	/**< pointer to function to execute */
 } scheduletable_t;
 
+/** @brief convert millisecond to system time unit
+ *
+ */
 #define scheduler_period_ms(time) (time)
 
-/* definition of scheduler control states */
+/** @brief task state types
+ *
+ */
 typedef enum
 {
-  SCHED_STOP = 0,
-  SCHED_RUN
+  SCHED_STOP = 0,			/**< task is stopped */
+  SCHED_RUN					/**< task is running */
 } schedule_ctrl_state_t;
 
 
-/* interface: periodic process scheduler
+/** @brief scheduler process
+ *
+ * executes the scheduler process within the system loop
+ *
  */
 extern void scheduler_process();
 
-/* interface: control process scheduling
- * processid: id of controlled process
- * controlcmd: cmd id to set process state
+/** @brief set process run state
+ *
+ * set the state of a scheduler arbitrated process
+ *
+ * @param[in] processid ID of the controlled process
+ *
+ * @param[in] controlcmd new state of the controlled process
  */
 extern void scheduler_control( uint8_t processid, schedule_ctrl_state_t controlcmd );
 

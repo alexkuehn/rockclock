@@ -20,9 +20,19 @@
 #ifndef SRC_HAL_TIMER_H_
 #define SRC_HAL_TIMER_H_
 
+/* external standard includes */
 
-#define HZ (1000)
-/* function: initialize system timer
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+#define HZ (1000)	/**< timer tick frequency in [Hz] */
+
+/** @brief initialize the system timer component
+ *
  */
 extern void timer_init( void );
 

@@ -20,10 +20,21 @@
 #ifndef SRC_HAL_TIMER_IF_H_
 #define SRC_HAL_TIMER_IF_H_
 
+/* external standard includes */
 #include <stdint.h>
 
-/* interface: get timer value
- * returns: 32bit timer increased every ms
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief get system timer tick value
+ *
+ * get the 32bit running value of the millisecond system timer
+ *
+ * @return timer tick value
  */
 extern uint32_t timer_get( void );
 

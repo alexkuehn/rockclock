@@ -20,7 +20,19 @@
 #ifndef SRC_OS_SCHEDULER_H_
 #define SRC_OS_SCHEDULER_H_
 
-/* interface: initialize scheduler
+/* external standard includes */
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+
+
+/** @brief initialize scheduling subcomponent
+ *
+ * initialize the scheduling subcomponent
+ *
  */
 extern void scheduler_init();
 

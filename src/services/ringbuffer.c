@@ -17,14 +17,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ringbuffer_if.h"
+/* external standard includes */
 #include <stdint.h>
+
+/* external includes */
+
+/* project includes */
+
+/* component includes */
+#include "ringbuffer_if.h"
 
 
 void ringbuffer_init( ringbuffer_t *rb, void  *databuffer, uint16_t datalength )
 {
+	/* initialize the ringbuffer class with the memory location */
 	rb->buffer = (uint8_t *)databuffer;
 	rb->length = datalength;
+	/* initialize the read,write positions */
 	rb->readpos = 0;
 	rb->writepos = 0;
 }
@@ -68,7 +77,7 @@ uint8_t ringbuffer_get_data( ringbuffer_t *rb, void *databuffer, uint16_t datale
 	uint16_t length = rb->length;
 	uint8_t *buffer = rb->buffer;
 
-	// get number of bytes available
+	/* get number of bytes available */
 	uint16_t available = ringbuffer_get_used(rb);
 
 	if (available > datalength)
@@ -76,7 +85,7 @@ uint8_t ringbuffer_get_data( ringbuffer_t *rb, void *databuffer, uint16_t datale
 		available = datalength;
 	}
 	if (available < 1)
-		return 0;		// return number of bytes copied
+		return 0;		/* nothing to get, return zero elements */
 
 	uint8_t *p = (uint8_t *)databuffer;
 	uint16_t i = 0;
@@ -99,7 +108,7 @@ uint8_t ringbuffer_get_data( ringbuffer_t *rb, void *databuffer, uint16_t datale
 			readpos = 0;
 	}
 	rb->readpos = readpos;
-	return i;                   // return number of bytes copied
+	return i;                   /* return number of elements copied */
 }
 
 uint8_t ringbuffer_put_data( ringbuffer_t *rb, void *databuffer, uint16_t datalength)
@@ -115,7 +124,7 @@ uint8_t ringbuffer_put_data( ringbuffer_t *rb, void *databuffer, uint16_t datale
 	}
 	if (available < 1)
 	{
-		return 0;               // return number of bytes copied
+		return 0;               /* no space left in buffer */
 	}
 
 	uint8_t *p = (uint8_t *)databuffer;
@@ -144,5 +153,5 @@ uint8_t ringbuffer_put_data( ringbuffer_t *rb, void *databuffer, uint16_t datale
 
 	rb->writepos = writepos;
 
-	return i;                   // return number of bytes copied
+	return i;                   /* return number of elements added */
 }

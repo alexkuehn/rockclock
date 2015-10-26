@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ws2812.h"
-
+/* external standard includes */
 #include <stdint.h>
 
+/* external includes */
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/dma.h>
@@ -28,23 +28,27 @@
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/scb.h>
 
-
+/* project includes */
 #include "io_if.h"
 
-static uint8_t low_pattern = 0x00;
-static uint8_t high_pattern = 0xFF;
+/* component includes */
+#include "ws2812.h"
 
-static uint8_t frame_pattern[3*NR_OF_LEDS_PER_CH*NR_OF_ROWS];
 
-static uint8_t bitframe_pattern[WS2812_BUFFERSIZE];
-static uint8_t bitframe_pattern_draw[WS2812_BUFFERSIZE];
+static uint8_t low_pattern = 0x00;		/**< bitpattern for low signal */
+static uint8_t high_pattern = 0xFF;		/**< bitpattern for high signal */
 
-static uint8_t waitcnt = 0;
+static uint8_t frame_pattern[3*NR_OF_LEDS_PER_CH*NR_OF_ROWS];	/**< framebuffer */
 
-static uint8_t *actual_bitframe = bitframe_pattern;
-static uint8_t *drawing_bitframe = bitframe_pattern_draw;
+static uint8_t bitframe_pattern[WS2812_BUFFERSIZE];			/**< bit unrolled framebuffer */
+static uint8_t bitframe_pattern_draw[WS2812_BUFFERSIZE];	/**< bit unrolled backbuffer */
 
-static volatile uint8_t update_flag = 0;
+static uint8_t waitcnt = 0;	/**< timer waiting counter */
+
+static uint8_t *actual_bitframe = bitframe_pattern;			/**< pointer to actual framebuffer */
+static uint8_t *drawing_bitframe = bitframe_pattern_draw;	/**< pointer to backbuffer */
+
+static volatile uint8_t update_flag = 0;		/**< buffer updating progress flag */
 
 void ws2812_clear( void )
 {
@@ -80,6 +84,11 @@ void ws2812_update( void )
 	colpos = 0;
 	incol = 0;
 	rgbpos = 0;
+
+	/* unroll the bits of a framebuffer */
+	/* every bit of an WS2812 datastream is machester encoded
+	 * translate every bit in a load value for timer
+	 */
 	for(i=0; i < WS2812_BUFFERSIZE; i++)
 	{
 		runbit = i & 7;
@@ -143,6 +152,10 @@ void ws2812_init( void )
 	/* configure the DMA */
 	rcc_periph_clock_enable(RCC_DMA);
 
+	/* configure DMA for sending high constant pattern to port on begin of cycle
+	 * send unrolled bitframe on Timer OC1 event
+	 * send low on Timer OC3 event
+	 */
 	dma_channel_reset( DMA1, DMA_CHANNEL3);
 	dma_set_peripheral_address( DMA1, DMA_CHANNEL3, (uint32_t)&GPIOB_ODR);
     dma_set_memory_address( DMA1, DMA_CHANNEL3, (uint32_t)&high_pattern);
@@ -183,16 +196,19 @@ void ws2812_init( void )
     rcc_periph_clock_enable(RCC_TIM3);
 
 
+    /* configure the timer for 800kHz overall frequency */
     timer_reset( TIM3 );
     timer_set_mode( TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
     timer_set_period( TIM3, 60);
     timer_set_repetition_counter( TIM3, 0);
     timer_disable_preload( TIM3 );
 
+    /* timer compare section 1 for low coding */
     timer_set_oc_mode( TIM3, TIM_OC1,TIM_OCM_FROZEN);
     timer_set_oc_value( TIM3, TIM_OC1, 19);
     timer_disable_oc_preload( TIM3, TIM_OC1);
 
+    /* timer compare section 3 for high coding */
     timer_set_oc_mode( TIM3, TIM_OC3,TIM_OCM_FROZEN);
     timer_set_oc_value( TIM3, TIM_OC3, 41);
     timer_disable_oc_preload( TIM3, TIM_OC3);
@@ -202,16 +218,26 @@ void ws2812_init( void )
     nvic_enable_irq(NVIC_TIM3_IRQ);
     nvic_enable_irq(NVIC_PENDSV_IRQ);
 
+    /* start the sending process */
     ws2812_send();
 }
 
+/** @brief Pending Service callback
+ *
+ * callback function for handling a pending service
+ */
 void pend_sv_handler( void )
 {
 
 }
 
+/** @brief DMA2,3 callback
+ *
+ * callback function for DMA transfer
+ */
 void dma1_channel2_3_isr( void )
 {
+	/* after DMA transfer completed enable timer 3 overflow */
 	dma_clear_interrupt_flags(DMA1, DMA_CHANNEL2, DMA_TCIF);
 	timer_enable_irq(TIM3, TIM_DIER_UIE);
 
@@ -228,6 +254,7 @@ void dma1_channel2_3_isr( void )
 
 void ws2812_send( void )
 {
+	/* init the DMA data transfer */
 
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL2, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
 	dma_clear_interrupt_flags( DMA1, DMA_CHANNEL3, DMA_TEIF | DMA_HTIF | DMA_TCIF | DMA_GIF);
@@ -262,13 +289,17 @@ void ws2812_send( void )
 
 }
 
+/** @brief Timer3 callback
+ *
+ * callback function for Timer3
+ */
 void tim3_isr(void)
 {
 	uint8_t *bftemp;
 	timer_clear_flag(TIM3, TIM_SR_UIF);
 
 
-
+	/* wait an amount of time to trigger the WS2812 sync pulse */
 	if( waitcnt < NR_OF_WAITCOUNTS)
 	{
 
@@ -282,6 +313,9 @@ void tim3_isr(void)
 		timer_disable_irq(TIM3, TIM_DIER_UIE);
 
 
+		/* if new framebuffer data is available
+		 * switch the unrolled buffer with the backbuffer
+		 */
 		if(update_flag == 1)
 		{
 
@@ -292,6 +326,7 @@ void tim3_isr(void)
 			update_flag = 0;
 		}
 
+		/* restart the sending process */
 		ws2812_send();
 	}
 }
