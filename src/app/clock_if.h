@@ -20,6 +20,8 @@
 #ifndef SRC_APP_CLOCK_IF_H_
 #define SRC_APP_CLOCK_IF_H_
 
+#include <stdint.h>
+
 typedef struct
 {
 	uint8_t h;
