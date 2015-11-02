@@ -87,3 +87,4 @@ The COM component contains the communication stack for different protocols
 ##### APP
 The APP component realizes the functional application itself.
 
+
