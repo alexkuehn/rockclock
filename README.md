@@ -32,11 +32,11 @@ LED chains are needed the STM32 ports GPIOB,1 to GPIOB,7 are usable.
 ##### Bluetooth communication
 For communication with other systems a bluetooth module is used. The bluetooth module is a HC05 type. The HC05 is connected directly to
 the STM32 over following port pins:
-|Function|Port|
-|---|---|
-| RX | GPIOA,Pin 2 |
-| TX | GPIOA, Pin 3 |
-| Config Mode | GPIOA, Pin 1 |
+Function|Port
+--------|----
+ RX | GPIOA,Pin 2 
+ TX | GPIOA, Pin 3 
+ Config Mode | GPIOA, Pin 1 
 
 ##### DCF77 receiver
 The DCF77 reciever module should provide a TTL digital output. It is connected to Port GPIOC, Pin0.
@@ -57,20 +57,20 @@ without changing the application itself.
 
 ##### Architecture convenience
 * First level components are ordered in subdirectories:
-| Component | Description |
-|---|---|
-|app|The main application|
-|com|communication subsystem|
-|hal|Hardware abstraction|
-|os|Operating system|
-|services|Different Services|
+Component | Description 
+----------|------------
+app|The main application
+com|communication subsystem
+hal|Hardware abstraction
+os|Operating system
+services|Different Services
 * Subcomponents have the following file layout:
-| File pattern| Purpose|
-|---|---|
-|component.c|Implementation of the component|
-|component.h|Internal declarations of the component|
-|component_config.h|Component configuration definitions|
-|component_if.h|Component outer interface|
+File pattern| Purpose
+------------|--------
+component.c|Implementation of the component
+component.h|Internal declarations of the component
+component_config.h|Component configuration definitions
+component_if.h|Component outer interface
 
 ##### HAL
 The HAL abstracts the hardware dependent parts. It contains everything which is platform specific.
