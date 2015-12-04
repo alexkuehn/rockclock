@@ -26,6 +26,7 @@
 #include "../hal/dcf_if.h"
 #include "../services/bitops_if.h"
 #include "../app/clock_if.h"
+#include "../hal/i2c_if.h"
 
 /* component includes */
 #include "dcf_decode_if.h"
@@ -35,10 +36,12 @@
 
 static uint64_t rawframe = 0;					/**< actual raw DCF frame */
 static dcftime_t last_decoded_time = {0,0};		/**< last decoded time from valid frame */
+static uint8_t timeupdate_count = 0;
 
 
 void dcf_decode_process( void )
 {
+	uint8_t rtcbuffer[3];
 	uint64_t tmpframe;
 	uint8_t inner_frame_q;
 	uint8_t minutes_bcd;
@@ -67,6 +70,16 @@ void dcf_decode_process( void )
 				if( dcf_decode_eval_inter_frame_q( acttime, last_decoded_time)== 1)
 				{
 					clock_set( hours, minutes, 0);
+
+					/* update the RTC memory only every 20th valid frame */
+					if( (timeupdate_count % 20)== 0 )
+					{
+						rtcbuffer[0] = dec2bcd( 0 );
+						rtcbuffer[1] = dec2bcd( minutes );
+						rtcbuffer[2] = dec2bcd( hours );
+						i2c_transmit_blocking( 0x68, 0x00, &rtcbuffer[0], 3);
+
+					}
 				}
 				last_decoded_time.h = hours;
 				last_decoded_time.m = minutes;

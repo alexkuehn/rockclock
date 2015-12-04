@@ -2,59 +2,60 @@
  * This file is part of ROCKCLOCK firmware.
  *
  * Copyright (c) 2015 Alexander Kühn <prj@alexkuehn.de>
- *     
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *       
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* external standard includes */
+#include <stdint.h>
 
 /* external includes */
 
 /* project includes */
-#include "../hal/usart_if.h"
-#include "../hal/ws2812_if.h"
-#include "../com/bt_if.h"
-#include "../hal/dcf_if.h"
-#include "../hal/i2c_if.h"
-#include "../app/clock_if.h"
-#include "../services/bitops_if.h"
 
 /* component includes */
-#include "app_config.h"
 
-
-
-void app_init(void)
+uint8_t bitops64_count( uint64_t bits)
 {
-	uint8_t rtcbuffer[3];
-
-	bt_init();
-	i2c_receive_blocking( 0x68, 0x00, &rtcbuffer[0], 3);
-
-	clock_set( bcd2dec(rtcbuffer[2]), bcd2dec(rtcbuffer[1]), bcd2dec(rtcbuffer[0]));
-
+	uint8_t counter = 0;
+	/* iterate over bits */
+	while( bits )
+	{
+		counter += bits % 2;
+		bits >>= 1;
+	}
+	return counter;
 }
 
-void clock_process( void )
+uint8_t bitops32_count( uint32_t bits)
 {
-
-	clock_update();
-
+	uint8_t counter = 0;
+	/* iterate over bits */
+	while( bits )
+	{
+		counter += bits % 2;
+		bits >>= 1;
+	}
+	return counter;
 }
 
-void loop_process(void)
+uint8_t bcd2dec( uint8_t bcdval )
 {
-
+	return( ( (bcdval & 0xF0)>>4)*10 + (bcdval & 0x0F) );
 }
 
+uint8_t dec2bcd( uint8_t decval )
+{
+	return( (decval/10)*16 +(decval%10) );
+}

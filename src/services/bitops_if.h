@@ -69,17 +69,7 @@
  *
  * @return number of set bits
  */
-extern inline uint8_t bitops64_count( uint64_t bits)
-{
-	uint8_t counter = 0;
-	/* iterate over bits */
-	while( bits )
-	{
-		counter += bits % 2;
-		bits >>= 1;
-	}
-	return counter;
-}
+extern uint8_t bitops64_count( uint64_t bits);
 
 /** @brief counts number of set bits in a 32bit value
  *
@@ -89,16 +79,26 @@ extern inline uint8_t bitops64_count( uint64_t bits)
  *
  * @return number of set bits
  */
-extern inline uint8_t bitops32_count( uint32_t bits)
-{
-	uint8_t counter = 0;
-	/* iterate over bits */
-	while( bits )
-	{
-		counter += bits % 2;
-		bits >>= 1;
-	}
-	return counter;
-}
+extern uint8_t bitops32_count( uint32_t bits);
+
+/** @brief convert bcd coded value to decimal
+ *
+ * convert bcd coded digits to decimal value
+ *
+ * @param[in] bcdval bcd coded digits
+ *
+ * @return decimal value
+ */
+extern uint8_t bcd2dec( uint8_t bcdval );
+
+/** @brief convert decimal value to bcd coded value
+ *
+ * convert decimal value to bcd coded value
+ *
+ * @param[in] decval bcd coded digits
+ *
+ * @return bcd coded representation
+ */
+extern uint8_t dec2bcd( uint8_t decval );
 
 #endif /* SRC_SERVICES_BITOPS_IF_H_ */

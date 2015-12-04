@@ -29,7 +29,26 @@
 /* component includes */
 #include "i2c_config.h"
 
+/** @brief blocking receive of I2C bus data
+ *
+ * receive data from I2C device
+ *
+ * @param[in] busaddr device adress on i2c bus with 7bit
+ * @param[in] reg register adress of device
+ * @param[out] data pointer to memory, where read values should be written
+ * @param[in] length length of data block to be read
+ */
+extern void i2c_receive_blocking( uint8_t busaddr, uint8_t reg, uint8_t *data, uint8_t length);
 
-
+/** @brief blocking transmit of I2C bus data
+ *
+ * transmit data to I2C device
+ *
+ * @param[in] busaddr device adress on i2c bus with 7bit
+ * @param[in] reg register adress of device
+ * @param[in] data pointer to memory, where values should be transferred
+ * @param[in] length length of data block to be written
+ */
+extern void i2c_transmit_blocking( uint8_t busaddr, uint8_t reg, uint8_t *data, uint8_t length);
 
 #endif /* SRC_HAL_I2C_IF_H_ */
