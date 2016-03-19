@@ -85,37 +85,64 @@ void clock_update( void )
 void clock_display( void)
 {
 	uint8_t i;
+	uint8_t hourscale;
 
 	for( i = 0; i < 60; i++)
 	{
 		if( i == 0 )
 		{
-			ws2812_set_pixel(0, i, 12,12,12);
+			ws2812_set_pixel(0, DISP_ROT(i), 0,6,8);
 		}
 		else
 		{
 			if( (i % 15) == 0)
 			{
-				ws2812_set_pixel(0,i, 0,0,20);
+				ws2812_set_pixel(0,DISP_ROT(i), 0,0,10);
 
 			}
 			else
 			{
 				if( (i % 5) == 0)
 				{
-					ws2812_set_pixel(0,i, 12,0,12);
+					ws2812_set_pixel(0,DISP_ROT(i), 0,0,5);
 
 				}
 				else
 				{
-					ws2812_set_pixel(0,i, 1,0,1);
+					ws2812_set_pixel(0,DISP_ROT(i), 0,0,1);
 				}
 			}
 		}
 	}
-	ws2812_set_pixel(0, (running_time.h % 12)*5, 12,12,0);
-	ws2812_set_pixel(0, running_time.m, 0, 20,0);
-	ws2812_set_pixel(0, running_time.s, 0, 12,12);
+
+	hourscale = (running_time.h % 12)*5;
+	ws2812_set_pixel(0, DISP_ROT((running_time.h % 12)*5), 20,0,0);
+	ws2812_set_pixel(0, DISP_ROT(running_time.m), 0, 20,0);
+	ws2812_set_pixel(0, DISP_ROT(running_time.s), 15, 12,0);
+
+	if( (hourscale == running_time.m) )
+	{
+		if( running_time.m == running_time.s)
+		{
+			ws2812_set_pixel(0, DISP_ROT(running_time.s), 35, 25,0);
+		}
+		else
+		{
+			ws2812_set_pixel(0, DISP_ROT(running_time.m), 20, 20,0);
+		}
+	}
+	else
+	{
+		if( running_time.m == running_time.s)
+		{
+			ws2812_set_pixel(0, DISP_ROT(running_time.m), 0, 45,0);
+		}
+
+		if( hourscale == running_time.s)
+		{
+			ws2812_set_pixel(0, DISP_ROT(hourscale), 45, 0,0);
+		}
+	}
 	ws2812_update();
 }
 

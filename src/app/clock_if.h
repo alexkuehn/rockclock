@@ -28,7 +28,7 @@
 /* project includes */
 
 /* component includes */
-
+#include "clock_config.h"
 
 /** @brief clock time structure
  *
@@ -55,6 +55,11 @@ extern void clock_update( void );
  */
 extern void clock_set( uint8_t h, uint8_t m, uint8_t s);
 
-
+/** @brief rotate the clock display
+ *
+ * @param[in] pixel Pixelvalue without offset
+ * @param[out] rotpixel Rotated Pixel value
+ */
+#define DISP_ROT(x) ( ((x)+CFG_CLOCK_DISP_ROTATE) % 60 )
 
 #endif /* SRC_APP_CLOCK_IF_H_ */
