@@ -43,9 +43,19 @@ typedef struct
 
 /** @brief update the clock value
  *
- * needs to be called within a exact seond
+ * needs to be called within a exact second
  */
 extern void clock_update( void );
+
+/** @brief mutes the clock output
+ *
+ * when set to true, the clock display output is disabled
+ * the clock display gets reenabled when set to false
+ *
+ *  * @param[in] mutestate new display mute state
+ */
+extern void clock_mute( uint8_t mutestate );
+
 
 /** @brief set the clock time manually
  *

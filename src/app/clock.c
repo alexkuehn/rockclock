@@ -18,6 +18,7 @@
  */
 
 /* external standard includes */
+#include <stdbool.h>
 
 /* external includes */
 
@@ -31,6 +32,8 @@
 #include "clock_config.h"
 
 static clock_t running_time = {0,0,0};	/**< actual time object */
+
+static uint8_t muted = false;			/**< actual state of display mute */
 
 void clock_set( uint8_t h, uint8_t m, uint8_t s)
 {
@@ -79,7 +82,10 @@ void clock_update( void )
 	/* increment the clock */
 	clock_tick();
 	/* show clock */
-	clock_display();
+	if( muted == false)
+	{
+		clock_display();
+	}
 }
 
 void clock_display( void)
@@ -146,8 +152,26 @@ void clock_display( void)
 	ws2812_update();
 }
 
+void clock_mute( uint8_t mutestate )
+{
+	if( mutestate != muted )
+	{
+		if( mutestate == true )
+		{
+			ws2812_clear();
+			ws2812_update();
+		}
+		else
+		{
+			clock_display();
+		}
+		muted = mutestate;
+	}
+}
+
 void clock_tick( void )
 {
+
 	running_time.s++;
 
 	if( running_time.s == 60)
