@@ -29,6 +29,7 @@
 #include "../hal/i2c_if.h"
 #include "../app/clock_if.h"
 #include "../services/bitops_if.h"
+#include "../app/remote_if.h"
 
 /* component includes */
 #include "app_config.h"
@@ -41,9 +42,9 @@ void app_init(void)
 
 	bt_init();
 	i2c_receive_blocking( 0x68, 0x00, &rtcbuffer[0], 3);
-
 	clock_set( bcd2dec(rtcbuffer[2]), bcd2dec(rtcbuffer[1]), bcd2dec(rtcbuffer[0]));
 
+	remote_init();
 }
 
 void clock_process( void )
@@ -55,6 +56,6 @@ void clock_process( void )
 
 void loop_process(void)
 {
-
+	remote_process();
 }
 
