@@ -18,6 +18,7 @@
  */
 
 /* external standard includes */
+#include <stdbool.h>
 
 /* external includes */
 
@@ -25,22 +26,98 @@
 #include "../hal/usart_if.h"
 #include "../hal/ws2812_if.h"
 #include "../com/bt_if.h"
-#include "../hal/dcf_if.h"
-#include "../hal/i2c_if.h"
 #include "../app/clock_if.h"
-#include "../services/bitops_if.h"
+#include "../hal/timer_if.h"
 
 /* component includes */
 #include "remote_config.h"
+#include "remote.h"
+
+static remote_state_t remotestate;
+static remote_slave_state_t remoteslavestate;
+static uint8_t protocolbuffer;
+static uint32_t timeouttime;
+static uint8_t arm_timeout;
+static uint8_t framebuffer[180];
+static uint8_t frameptr;
 
 
-
+static uint8_t dbgc = 't';
 void remote_init(void)
 {
+	remotestate = REMOTE_STATE_NC;
+	arm_timeout = false;
 }
 
 void remote_process( void )
 {
+	int16_t received_num;
+	/* only process when the connection is ready */
+	if( bt_is_ready())
+	{
+		switch( remotestate )
+		{
+			case REMOTE_STATE_NC:
+				received_num = usart_receive( &protocolbuffer, 1, 50 );
+
+				if( received_num > 0)
+				{
+					if( protocolbuffer == REMOTE_PROTOCOL_START_SLAVE)
+					{
+						remotestate = REMOTE_STATE_SLAVE;
+						remoteslavestate = REMOTE_SLAVE_WAIT;
+						arm_timeout = true;
+						timeouttime = timer_get() + REMOTE_TIMEOUT;
+						clock_mute(true);
+					}
+				}
+				break;
+			case REMOTE_STATE_SLAVE:
+				switch( remoteslavestate )
+				{
+					case REMOTE_SLAVE_WAIT:
+						received_num = usart_receive( &protocolbuffer, 1, 50 );
+						if( received_num > 0)
+						{
+							if( protocolbuffer == REMOTE_PROTOCOL_HEARTBEAT)
+							{
+								timeouttime = timer_get() + REMOTE_TIMEOUT;
+							}
+
+							if( protocolbuffer == REMOTE_PROTOCOL_LEAVE_SLAVE)
+							{
+								remotestate = REMOTE_STATE_NC;
+								arm_timeout = false;
+								clock_mute(false);
+							}
+
+							if( protocolbuffer == REMOTE_PROTOCOL_SLAVE_STARTFRAME)
+							{
+								remoteslavestate = REMOTE_SLAVE_FRAME;
+								frameptr = 0;
+								timeouttime = timer_get() + REMOTE_TIMEOUT;
+							}
+						}
+						else
+						{
+							if( timer_get() > timeouttime)
+							{
+								remotestate = REMOTE_STATE_NC;
+								arm_timeout = false;
+								clock_mute(false);
+							}
+						}
+						break;
+					case REMOTE_SLAVE_FRAME:
+						break;
+					default:
+						break;
+				}
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 

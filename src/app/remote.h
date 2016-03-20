@@ -29,5 +29,26 @@
 /* component includes */
 
 
+#define REMOTE_TIMEOUT  (1000) /**<  com connection timeout [ms] */
+
+/* protocol symbols */
+#define REMOTE_PROTOCOL_START_SLAVE 's'
+#define REMOTE_PROTOCOL_LEAVE_SLAVE 'x'
+#define REMOTE_PROTOCOL_SLAVE_STARTFRAME 'f'
+#define REMOTE_PROTOCOL_HEARTBEAT 'h'
+
+/* communication states */
+typedef enum
+{
+   REMOTE_STATE_NC = 0,
+   REMOTE_STATE_SLAVE
+} remote_state_t;
+
+/* slavemode states */
+typedef enum
+{
+   REMOTE_SLAVE_WAIT = 0,
+   REMOTE_SLAVE_FRAME
+} remote_slave_state_t;
 
 #endif /* SRC_APP_REMOTE_H_ */
