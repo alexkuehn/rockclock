@@ -42,7 +42,6 @@ static uint8_t framebuffer[REMOTE_BUFFER_SIZE];
 static uint8_t frameptr;
 static int16_t receive_remain;
 
-static uint8_t dbgc = 't';
 void remote_init(void)
 {
 	remotestate = REMOTE_STATE_NC;
@@ -156,9 +155,9 @@ void remote_display(void)
 
 	for( i=0; i < 60; i++)
 	{
+
 		ws2812_set_pixel(0, i, framebuffer[3*i],
 				framebuffer[3*i+1], framebuffer[3*i+2]);
-
 	}
 	ws2812_update();
 }
