@@ -38,9 +38,9 @@ static remote_slave_state_t remoteslavestate;
 static uint8_t protocolbuffer;
 static uint32_t timeouttime;
 static uint8_t arm_timeout;
-static uint8_t framebuffer[180];
+static uint8_t framebuffer[REMOTE_BUFFER_SIZE];
 static uint8_t frameptr;
-
+static int16_t receive_remain;
 
 static uint8_t dbgc = 't';
 void remote_init(void)
@@ -79,6 +79,14 @@ void remote_process( void )
 						received_num = usart_receive( &protocolbuffer, 1, 50 );
 						if( received_num > 0)
 						{
+
+							if( protocolbuffer == REMOTE_PROTOCOL_SLAVE_STARTFRAME)
+							{
+								remoteslavestate = REMOTE_SLAVE_FRAME;
+								frameptr = 0;
+								timeouttime = timer_get() + REMOTE_TIMEOUT;
+							}
+
 							if( protocolbuffer == REMOTE_PROTOCOL_HEARTBEAT)
 							{
 								timeouttime = timer_get() + REMOTE_TIMEOUT;
@@ -89,13 +97,6 @@ void remote_process( void )
 								remotestate = REMOTE_STATE_NC;
 								arm_timeout = false;
 								clock_mute(false);
-							}
-
-							if( protocolbuffer == REMOTE_PROTOCOL_SLAVE_STARTFRAME)
-							{
-								remoteslavestate = REMOTE_SLAVE_FRAME;
-								frameptr = 0;
-								timeouttime = timer_get() + REMOTE_TIMEOUT;
 							}
 						}
 						else
@@ -109,6 +110,35 @@ void remote_process( void )
 						}
 						break;
 					case REMOTE_SLAVE_FRAME:
+						receive_remain = REMOTE_BUFFER_SIZE - frameptr;
+						if( receive_remain > REMOTE_BUFFER_BLOCK)
+						{
+							receive_remain = REMOTE_BUFFER_BLOCK;
+						}
+
+						received_num = usart_receive( &framebuffer[0+frameptr], receive_remain, 50 );
+
+						if( received_num > 0)
+						{
+							frameptr += received_num;
+
+							if( frameptr >= REMOTE_BUFFER_SIZE)
+							{
+								remote_display();
+								remoteslavestate = REMOTE_SLAVE_WAIT;
+								timeouttime = timer_get() + REMOTE_TIMEOUT;
+							}
+						}
+						else
+						{
+							if( timer_get() > timeouttime)
+							{
+								remotestate = REMOTE_STATE_NC;
+								arm_timeout = false;
+								clock_mute(false);
+							}
+						}
+
 						break;
 					default:
 						break;
@@ -120,4 +150,16 @@ void remote_process( void )
 	}
 }
 
+void remote_display(void)
+{
+	uint8_t i;
+
+	for( i=0; i < 60; i++)
+	{
+		ws2812_set_pixel(0, i, framebuffer[3*i],
+				framebuffer[3*i+1], framebuffer[3*i+2]);
+
+	}
+	ws2812_update();
+}
 

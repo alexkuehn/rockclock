@@ -29,6 +29,9 @@
 /* component includes */
 
 
+#define REMOTE_BUFFER_SIZE 180
+#define REMOTE_BUFFER_BLOCK 60
+
 #define REMOTE_TIMEOUT  (1000) /**<  com connection timeout [ms] */
 
 /* protocol symbols */
@@ -50,5 +53,11 @@ typedef enum
    REMOTE_SLAVE_WAIT = 0,
    REMOTE_SLAVE_FRAME
 } remote_slave_state_t;
+
+
+/** @brief display the remote buffer
+ *
+ */
+extern void remote_display(void);
 
 #endif /* SRC_APP_REMOTE_H_ */
