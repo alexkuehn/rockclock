@@ -43,49 +43,60 @@ void clock_set( uint8_t h, uint8_t m, uint8_t s)
 }
 void clock_update( void )
 {
-	/* try to decode the DCF value */
-	dcf_decode_process();
+	static uint8_t clockstep = 0;
+
+	if( clockstep == 9)
+	{
+		/* try to decode the DCF value */
+		dcf_decode_process();
 #if(CFG_DBG_DCF_BINARY)
-	uint64_t dcfframe = 0;
-	uint8_t i;
+		uint64_t dcfframe = 0;
+		uint8_t i;
 #endif
 
 
 #if(CFG_DBG_DCF_BINARY)
-	dcfframe = dcf_decode_get_raw();
-	ws2812_set_pixel(0,59, 0,0,5);
+		dcfframe = dcf_decode_get_raw();
+		ws2812_set_pixel(0,59, 0,0,5);
 
 
-	for( i=0; i < 59; i++)
-	{
-		if( (dcfframe & ((uint64_t)1ULL << i)) != 0 )
+		for( i=0; i < 59; i++)
 		{
-			ws2812_set_pixel(0,i,10,0,0);
-			if( i == 20)
+			if( (dcfframe & ((uint64_t)1ULL << i)) != 0 )
 			{
-				ws2812_set_pixel(0,i,5,5,0);
-			}
-		}
-		else
-		{
-			ws2812_set_pixel(0,i,0,10,0);
-			if( i == 20)
+				ws2812_set_pixel(0,i,10,0,0);
+				if( i == 20)
 				{
-					ws2812_set_pixel(0,i,0,5,5);
+					ws2812_set_pixel(0,i,5,5,0);
 				}
+			}
+			else
+			{
+				ws2812_set_pixel(0,i,0,10,0);
+				if( i == 20)
+					{
+						ws2812_set_pixel(0,i,0,5,5);
+					}
+			}
+
 		}
+
+		ws2812_update();
+#endif
+		/* increment the clock */
+		clock_tick();
 
 	}
-
-	ws2812_update();
-#endif
-	/* increment the clock */
-	clock_tick();
 	/* show clock */
 	if( muted == false)
 	{
 		clock_display();
 	}
+
+	/* run through the clockstep */
+	clockstep++;
+	clockstep %= 10;
+
 }
 
 void clock_display( void)

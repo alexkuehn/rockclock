@@ -28,6 +28,17 @@
 
 /* component includes */
 
+typedef struct {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+} pixel_t;
+
+typedef struct {
+	int16_t rdiff;
+	int16_t gdiff;
+	int16_t bdiff;
+} pixeldiff_t;
 
 /** @brief increment internal clock by second
  */
