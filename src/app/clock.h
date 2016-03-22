@@ -36,18 +36,22 @@ typedef struct {
 } pixel_t;
 
 typedef struct {
-	uint32_t r;
-	uint32_t g;
-	uint32_t b;
+	int32_t r;
+	int32_t g;
+	int32_t b;
 } hires_pixel_t;
 
 typedef struct {
-	int16_t rdiff;
-	int16_t gdiff;
-	int16_t bdiff;
+	int32_t r;
+	int32_t g;
+	int32_t b;
 } pixeldiff_t;
 
 #define CLOCK_ELEMENTS 60     /**< number of clock pixel elements */
+
+/** @brief handle the display sub frame steps
+ */
+extern void clock_display_step( uint8_t step );
 
 /** @brief update framebuffer transition
  */

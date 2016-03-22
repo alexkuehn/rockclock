@@ -50,9 +50,17 @@ void clock_clear_fb( void )
 {
   for( uint8_t i=0; i < CLOCK_ELEMENTS; i++)
     {
-      clock_vfb_integrator[i] = {.r=0, .g=0, .b=0};
-      clock_vfb_next[i] = {.r=0, .g=0, .b=0};
-      transition_pattern[i] = {.r=0, .g=0, .b=0 };
+      clock_vfb_integrator[i].r  = 0;
+      clock_vfb_integrator[i].g  = 0;
+      clock_vfb_integrator[i].b  = 0;
+
+      clock_vfb_next[i].r  = 0;
+      clock_vfb_next[i].g  = 0;
+      clock_vfb_next[i].b  = 0;
+
+      transition_pattern[i].r  = 0;
+      transition_pattern[i].g  = 0;
+      transition_pattern[i].b  = 0;
     }
 }
 
@@ -133,7 +141,7 @@ void clock_display_step( uint8_t step )
 {
         for( uint8_t i=0; i < CLOCK_ELEMENTS; i++ )
           {
-            if( clockstep == 9 )
+            if( step == 9 )
               {
                 clock_vfb_integrator[i].r = clock_vfb_next[i].r*1024;
                 clock_vfb_integrator[i].g = clock_vfb_next[i].g*1024;
@@ -145,7 +153,7 @@ void clock_display_step( uint8_t step )
                 clock_vfb_integrator[i].g += transition_pattern[i].g;
                 clock_vfb_integrator[i].b += transition_pattern[i].b;
               }
-            if( mutestate == false )
+            if( muted == false )
               {
                 ws2812_set_pixel(0, i, clock_vfb_integrator[i].r/1024,
                              clock_vfb_integrator[i].g/1024,
@@ -153,7 +161,7 @@ void clock_display_step( uint8_t step )
               }
           }
 
-        if( mutestate == false )
+        if( muted == false )
           {
             ws2812_update();
           }
