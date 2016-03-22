@@ -28,6 +28,7 @@
 
 /* component includes */
 
+
 typedef struct {
 	uint8_t r;
 	uint8_t g;
@@ -35,10 +36,30 @@ typedef struct {
 } pixel_t;
 
 typedef struct {
+	uint32_t r;
+	uint32_t g;
+	uint32_t b;
+} hires_pixel_t;
+
+typedef struct {
 	int16_t rdiff;
 	int16_t gdiff;
 	int16_t bdiff;
 } pixeldiff_t;
+
+#define CLOCK_ELEMENTS 60     /**< number of clock pixel elements */
+
+/** @brief update framebuffer transition
+ */
+extern void clock_fb_update( void );
+
+/** @brief clear clock internal framebuffer
+ */
+extern void clock_clear_fb( void );
+
+/** @brief set pixel in internal framebuffer
+ */
+extern void clock_set_pixel( uint8_t pos, uint8_t red, uint8_t green, uint8_t blue );
 
 /** @brief increment internal clock by second
  */

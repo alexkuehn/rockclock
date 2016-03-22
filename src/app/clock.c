@@ -31,20 +31,44 @@
 #include "clock.h"
 #include "clock_config.h"
 
-static clock_t running_time = {0,0,0};	/**< actual time object */
+static clock_t running_time = {0,0,0};                 /**< actual time object */
 
-static uint8_t muted = false;			/**< actual state of display mute */
-
+static uint8_t muted = false;			               /**< actual state of display mute */
+static hires_pixel_t clock_vfb_integrator[CLOCK_ELEMENTS];   /**< framebuffer for clock elements */
+static pixel_t clock_vfb_next[CLOCK_ELEMENTS];         /**< framebuffer for next clock elements */
+static pixeldiff_t transition_pattern[CLOCK_ELEMENTS]; /**< transition pattern between clock cycles */
+static uint8_t firstcall = true;                       /**< flag that this is our first cycle */
+                         
 void clock_set( uint8_t h, uint8_t m, uint8_t s)
 {
 	running_time.h = h;
 	running_time.m = m;
 	running_time.s = s;
 }
+
+void clock_clear_fb( void )
+{
+  for( uint8_t i=0; i < CLOCK_ELEMENTS; i++)
+    {
+      clock_vfb_integrator[i] = {.r=0, .g=0, .b=0};
+      clock_vfb_next[i] = {.r=0, .g=0, .b=0};
+      transition_pattern[i] = {.r=0, .g=0, .b=0 };
+    }
+}
+
 void clock_update( void )
 {
 	static uint8_t clockstep = 0;
 
+    if( firstcall == true )
+    {
+        firstcall = false;
+        clock_clear_fb();
+    }
+    
+	/* show clock */
+    clock_display_step(clockstep);
+    
 	if( clockstep == 9)
 	{
 		/* try to decode the DCF value */
@@ -86,17 +110,54 @@ void clock_update( void )
 		/* increment the clock */
 		clock_tick();
 
-	}
-	/* show clock */
-	if( muted == false)
-	{
-		clock_display();
+        clock_display();
+
+
+       
 	}
 
 	/* run through the clockstep */
 	clockstep++;
 	clockstep %= 10;
 
+}
+
+void clock_set_pixel( uint8_t pos, uint8_t red, uint8_t green, uint8_t blue )
+{
+    clock_vfb_next[pos].r = red;
+    clock_vfb_next[pos].g = green;
+    clock_vfb_next[pos].b = blue;
+}
+
+void clock_display_step( uint8_t step )
+{
+        for( uint8_t i=0; i < CLOCK_ELEMENTS; i++ )
+          {
+            if( clockstep == 9 )
+              {
+                clock_vfb_integrator[i].r = clock_vfb_next[i].r*1024;
+                clock_vfb_integrator[i].g = clock_vfb_next[i].g*1024;
+                clock_vfb_integrator[i].b = clock_vfb_next[i].b*1024;
+              }
+            else
+              {
+                clock_vfb_integrator[i].r += transition_pattern[i].r;
+                clock_vfb_integrator[i].g += transition_pattern[i].g;
+                clock_vfb_integrator[i].b += transition_pattern[i].b;
+              }
+            if( mutestate == false )
+              {
+                ws2812_set_pixel(0, i, clock_vfb_integrator[i].r/1024,
+                             clock_vfb_integrator[i].g/1024,
+                             clock_vfb_integrator[i].b/1024 );
+              }
+          }
+
+        if( mutestate == false )
+          {
+            ws2812_update();
+          }
+  
 }
 
 void clock_display( void)
@@ -108,59 +169,69 @@ void clock_display( void)
 	{
 		if( i == 0 )
 		{
-			ws2812_set_pixel(0, DISP_ROT(i), 0,6,8);
+			clock_set_pixel(DISP_ROT(i), 0,6,8);
 		}
 		else
 		{
 			if( (i % 15) == 0)
 			{
-				ws2812_set_pixel(0,DISP_ROT(i), 0,0,10);
+				clock_set_pixel(DISP_ROT(i), 0,0,10);
 
 			}
 			else
 			{
 				if( (i % 5) == 0)
 				{
-					ws2812_set_pixel(0,DISP_ROT(i), 0,0,5);
+					clock_set_pixel(DISP_ROT(i), 0,0,5);
 
 				}
 				else
 				{
-					ws2812_set_pixel(0,DISP_ROT(i), 0,0,1);
+				    clock_set_pixel(DISP_ROT(i), 0,0,1);
 				}
 			}
 		}
 	}
 
 	hourscale = (running_time.h % 12)*5;
-	ws2812_set_pixel(0, DISP_ROT((running_time.h % 12)*5), 20,0,0);
-	ws2812_set_pixel(0, DISP_ROT(running_time.m), 0, 20,0);
-	ws2812_set_pixel(0, DISP_ROT(running_time.s), 15, 12,0);
+	clock_set_pixel( DISP_ROT((running_time.h % 12)*5), 20,0,0);
+	clock_set_pixel( DISP_ROT(running_time.m), 0, 20,0);
+	clock_set_pixel( DISP_ROT(running_time.s), 15, 12,0);
 
 	if( (hourscale == running_time.m) )
 	{
 		if( running_time.m == running_time.s)
 		{
-			ws2812_set_pixel(0, DISP_ROT(running_time.s), 35, 25,0);
+			clock_set_pixel( DISP_ROT(running_time.s), 35, 25,0);
 		}
 		else
 		{
-			ws2812_set_pixel(0, DISP_ROT(running_time.m), 20, 20,0);
+			clock_set_pixel( DISP_ROT(running_time.m), 20, 20,0);
 		}
 	}
 	else
 	{
 		if( running_time.m == running_time.s)
 		{
-			ws2812_set_pixel(0, DISP_ROT(running_time.m), 0, 45,0);
+			clock_set_pixel( DISP_ROT(running_time.m), 0, 45,0);
 		}
 
 		if( hourscale == running_time.s)
 		{
-			ws2812_set_pixel(0, DISP_ROT(hourscale), 45, 0,0);
+			clock_set_pixel( DISP_ROT(hourscale), 45, 0,0);
 		}
 	}
-	ws2812_update();
+	clock_fb_update();
+}
+
+void clock_fb_update( void )
+{
+  for(uint8_t i=0; i < CLOCK_ELEMENTS; i++ )
+    {
+      transition_pattern[i].r = ((clock_vfb_next[i].r * 1024) - clock_vfb_integrator[i].r)/10;
+      transition_pattern[i].g = ((clock_vfb_next[i].g * 1024) - clock_vfb_integrator[i].g)/10;
+      transition_pattern[i].b = ((clock_vfb_next[i].b * 1024) - clock_vfb_integrator[i].b)/10;
+    }
 }
 
 void clock_mute( uint8_t mutestate )
@@ -171,10 +242,6 @@ void clock_mute( uint8_t mutestate )
 		{
 			ws2812_clear();
 			ws2812_update();
-		}
-		else
-		{
-			clock_display();
 		}
 		muted = mutestate;
 	}
