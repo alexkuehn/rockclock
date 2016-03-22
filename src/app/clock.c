@@ -77,7 +77,7 @@ void clock_update( void )
 	/* show clock */
     clock_display_step(clockstep);
     
-	if( clockstep == 9)
+	if( clockstep == (MAX_CLOCKSTEP-1))
 	{
 		/* try to decode the DCF value */
 		dcf_decode_process();
@@ -126,7 +126,7 @@ void clock_update( void )
 
 	/* run through the clockstep */
 	clockstep++;
-	clockstep %= 10;
+	clockstep %= MAX_CLOCKSTEP;
 
 }
 
@@ -141,7 +141,7 @@ void clock_display_step( uint8_t step )
 {
         for( uint8_t i=0; i < CLOCK_ELEMENTS; i++ )
           {
-            if( step == 9 )
+            if( step == (MAX_CLOCKSTEP-1) )
               {
                 clock_vfb_integrator[i].r = clock_vfb_next[i].r*1024;
                 clock_vfb_integrator[i].g = clock_vfb_next[i].g*1024;
@@ -236,9 +236,9 @@ void clock_fb_update( void )
 {
   for(uint8_t i=0; i < CLOCK_ELEMENTS; i++ )
     {
-      transition_pattern[i].r = ((clock_vfb_next[i].r * 1024) - clock_vfb_integrator[i].r)/10;
-      transition_pattern[i].g = ((clock_vfb_next[i].g * 1024) - clock_vfb_integrator[i].g)/10;
-      transition_pattern[i].b = ((clock_vfb_next[i].b * 1024) - clock_vfb_integrator[i].b)/10;
+      transition_pattern[i].r = ((clock_vfb_next[i].r * 1024) - clock_vfb_integrator[i].r)/MAX_CLOCKSTEP;
+      transition_pattern[i].g = ((clock_vfb_next[i].g * 1024) - clock_vfb_integrator[i].g)/MAX_CLOCKSTEP;
+      transition_pattern[i].b = ((clock_vfb_next[i].b * 1024) - clock_vfb_integrator[i].b)/MAX_CLOCKSTEP;
     }
 }
 

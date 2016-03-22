@@ -48,6 +48,8 @@ typedef struct {
 } pixeldiff_t;
 
 #define CLOCK_ELEMENTS 60     /**< number of clock pixel elements */
+#define MAX_CLOCKSTEP 20	 /**< number of clock frame steps */
+
 
 /** @brief handle the display sub frame steps
  */

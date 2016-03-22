@@ -37,7 +37,7 @@
  */
 #define schedule_cb_table                          \
 {                                                  \
-   { scheduler_period_ms(100),	&clock_process	}, 	\
+   { scheduler_period_ms(50),	&clock_process	}, 	\
 }
 
 #define PROCESS_CLOCK 0		/**< taskid for CLOCK process */
