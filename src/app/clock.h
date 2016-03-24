@@ -65,7 +65,7 @@ extern void clock_clear_fb( void );
 
 /** @brief set pixel in internal framebuffer
  */
-extern void clock_set_pixel( uint8_t pos, uint8_t red, uint8_t green, uint8_t blue );
+extern void clock_set_pixel( uint8_t pos, pixel_t pixelval );
 
 /** @brief increment internal clock by second
  */
