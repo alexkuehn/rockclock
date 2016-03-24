@@ -76,7 +76,7 @@ enum
 } clock_marker_e;
 
 const pixel_t clock_markers[CLOCK_MARKER_SIZE] = {
-		{   0,  66,  74 },		/* CLOCK_MARKER_TOP */
+		{   0,  70,  70 },		/* CLOCK_MARKER_TOP */
 		{   0,   0,  80 },		/* CLOCK_MARKER_QUARTER */
 		{   0,   0,  61 },		/* CLOCK_MARKER_FIVE */
 		{   0,   0,  32 },		/* CLOCK_MARKER_ELEM */
