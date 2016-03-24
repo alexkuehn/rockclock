@@ -78,7 +78,7 @@ void scheduler_process()
       period = scheduletable[i].period;
 
       tickdiff = tickend - tickstart[i];
-      if( tickdiff > period )
+      if( tickdiff >= period )
       {
          tickstart[i] = tickend;
          schedule_runflag[i] = 1;

@@ -25,6 +25,8 @@
 /* project includes */
 #include "../hal/ws2812_if.h"
 #include "../app/dcf_decode_if.h"
+#include "../hal/i2c_if.h"
+#include "../services/bitops_if.h"
 
 /* component includes */
 #include "clock_if.h"
@@ -57,7 +59,7 @@ const uint8_t gammatable[256] = {
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
 
-typedef enum
+enum
 {
 	CLOCK_MARKER_TOP = 0,
 	CLOCK_MARKER_QUARTER,
@@ -71,7 +73,7 @@ typedef enum
 	CLOCK_MARKER_HS,
 	CLOCK_MARKER_MS,
 	CLOCK_MARKER_SIZE
-};
+} clock_marker_e;
 
 const pixel_t clock_markers[CLOCK_MARKER_SIZE] = {
 		{   0,  66,  74 },		/* CLOCK_MARKER_TOP */
@@ -116,6 +118,7 @@ void clock_clear_fb( void )
 void clock_update( void )
 {
 	static uint8_t clockstep = 0;
+
 
     if( firstcall == true )
     {
@@ -291,6 +294,14 @@ void clock_fb_update( void )
     }
 }
 
+void clock_resync( void )
+{
+	uint8_t rtcbuffer[3];
+
+	i2c_receive_blocking( 0x68, 0x00, &rtcbuffer[0], 3);
+	clock_set( bcd2dec(rtcbuffer[2]), bcd2dec(rtcbuffer[1]), bcd2dec(rtcbuffer[0]));
+}
+
 void clock_mute( uint8_t mutestate )
 {
 	if( mutestate != muted )
@@ -300,28 +311,39 @@ void clock_mute( uint8_t mutestate )
 			ws2812_clear();
 			ws2812_update();
 		}
+		else
+		{
+			clock_resync();
+		}
 		muted = mutestate;
 	}
 }
 
 void clock_tick( void )
 {
+	static uint16_t resync_time = 0;
 
-	running_time.s++;
+	if( resync_time == MAX_RESYNC_TIME)
+	{
+		clock_resync();
+	}
+	else
+	{
+		running_time.s++;
 
-	if( running_time.s == 60)
-	{
-		running_time.s = 0;
-		running_time.m++;
+		if( running_time.s == 60)
+		{
+			running_time.s = 0;
+			running_time.m++;
+		}
+		if( running_time.m == 60)
+		{
+			running_time.m = 0;
+			running_time.h++;
+		}
+		if( running_time.h == 24)
+		{
+			running_time.h = 0;
+		}
 	}
-	if( running_time.m == 60)
-	{
-		running_time.m = 0;
-		running_time.h++;
-	}
-	if( running_time.h == 24)
-	{
-		running_time.h = 0;
-	}
-
 }

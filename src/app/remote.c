@@ -59,7 +59,7 @@ void remote_process( void )
 		switch( remotestate )
 		{
 			case REMOTE_STATE_NC:
-				received_num = usart_receive( &protocolbuffer, 1, 50 );
+				received_num = usart_receive( &protocolbuffer, 1, 0 );
 
 				if( received_num > 0)
 				{

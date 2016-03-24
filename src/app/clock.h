@@ -49,7 +49,7 @@ typedef struct {
 
 #define CLOCK_ELEMENTS 60     /**< number of clock pixel elements */
 #define MAX_CLOCKSTEP 20	 /**< number of clock frame steps */
-
+#define MAX_RESYNC_TIME 3600 /**< resync clock display with rtc every n seconds */
 
 /** @brief handle the display sub frame steps
  */
@@ -74,5 +74,9 @@ extern void clock_tick( void );
 /** @brief display the clock on WS2812 ring
  */
 extern void clock_display( void);
+
+/** @brief resync clock display with RTC
+ */
+extern void clock_resync( void );
 
 #endif /* SRC_APP_CLOCK_H_ */
