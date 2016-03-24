@@ -38,6 +38,7 @@
 #define REMOTE_PROTOCOL_START_SLAVE 's'
 #define REMOTE_PROTOCOL_LEAVE_SLAVE 'x'
 #define REMOTE_PROTOCOL_SLAVE_STARTFRAME 'f'
+#define REMOTE_PROTOCOL_SLAVE_SETCLOCK 'c'
 #define REMOTE_PROTOCOL_HEARTBEAT 'h'
 
 /* communication states */
@@ -51,7 +52,8 @@ typedef enum
 typedef enum
 {
    REMOTE_SLAVE_WAIT = 0,
-   REMOTE_SLAVE_FRAME
+   REMOTE_SLAVE_FRAME,
+   REMOTE_SLAVE_SETCLOCK
 } remote_slave_state_t;
 
 

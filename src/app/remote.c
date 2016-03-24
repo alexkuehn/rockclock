@@ -28,6 +28,7 @@
 #include "../com/bt_if.h"
 #include "../app/clock_if.h"
 #include "../hal/timer_if.h"
+#include "../hal/i2c_if.h"
 
 /* component includes */
 #include "remote_config.h"
@@ -39,6 +40,7 @@ static uint8_t protocolbuffer;
 static uint32_t timeouttime;
 static uint8_t arm_timeout;
 static uint8_t framebuffer[REMOTE_BUFFER_SIZE];
+static uint8_t clockbuffer[3];
 static uint8_t frameptr;
 static int16_t receive_remain;
 
@@ -82,6 +84,13 @@ void remote_process( void )
 							if( protocolbuffer == REMOTE_PROTOCOL_SLAVE_STARTFRAME)
 							{
 								remoteslavestate = REMOTE_SLAVE_FRAME;
+								frameptr = 0;
+								timeouttime = timer_get() + REMOTE_TIMEOUT;
+							}
+
+							if( protocolbuffer == REMOTE_PROTOCOL_SLAVE_SETCLOCK)
+							{
+								remoteslavestate = REMOTE_SLAVE_SETCLOCK;
 								frameptr = 0;
 								timeouttime = timer_get() + REMOTE_TIMEOUT;
 							}
@@ -138,6 +147,30 @@ void remote_process( void )
 							}
 						}
 
+						break;
+					case REMOTE_SLAVE_SETCLOCK:
+						received_num = usart_receive( clockbuffer, 3, 200 );
+						if( received_num > 0 )
+						{
+							if(received_num >= 3)
+							{
+								uint8_t rtcbuffer[3];
+								rtcbuffer[0] = dec2bcd( clockbuffer[2] );
+								rtcbuffer[1] = dec2bcd( clockbuffer[1] );
+								rtcbuffer[2] = dec2bcd( clockbuffer[0] );
+								clock_set( clockbuffer[0], clockbuffer[1], clockbuffer[2]);
+								i2c_transmit_blocking( 0x68, 0x00, &rtcbuffer[0], 3);
+							}
+						}
+						else
+						{
+							if( timer_get() > timeouttime)
+							{
+								remotestate = REMOTE_STATE_NC;
+								arm_timeout = false;
+								clock_mute(false);
+							}
+						}
 						break;
 					default:
 						break;
