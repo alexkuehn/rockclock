@@ -31,7 +31,7 @@
 
 #define CFG_DBG_DCF_BINARY 0		/**< debug: display decoded DCF frame */
 
-#define CFG_CLOCK_DISP_ROTATE 30	/**< rotation of display elements */
+#define CFG_CLOCK_DISP_ROTATE 15	/**< rotation of display elements */
 
 
 #endif /* SRC_APP_CLOCK_CONFIG_H_ */
